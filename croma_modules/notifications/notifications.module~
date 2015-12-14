@@ -1,0 +1,62 @@
+<?php
+/**
+ * @file
+ * This is the main module file.
+ */
+
+include_once("notifications.inc");
+include_once("display.php");
+include_once("/var/www-croma/croma_modules/blockSupport.php");
+
+// $blockInfo - an array of info that is passed to Drupal
+//      when it asks about the module.
+//
+// $blockViewFns - an array of functions that are called
+//      when Drupal calls *_block_view();
+//
+
+global $notificationsBlockInfo;
+global $notificationsBlockViewFns;
+
+$notificationsBlockInfo = array();
+$notificationsBlockViewFns = array();
+
+/*
+  Implements hook_help().
+*/
+function notifications_help($path, $arg) {
+
+  if ($path == 'admin/help#rupalform') {
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The notification module manages notifications in CROMA.') . '</p>';
+    return $output;
+  }
+}
+
+//
+// provide information about the blocks that this module provides
+//
+function notifications_block_info()
+{
+  global $notificationsBlockInfo;
+
+  return($notificationsBlockInfo);
+}
+
+//
+// hook in the blocks
+//
+function notifications_block_view($delta = '')
+{
+    global $notificationsBlockViewFns;
+
+    $block = array();
+
+    if(array_key_exists($delta,$notificationsBlockViewFns)) {
+      $notificationsBlockViewFns[$delta]($block);
+    }
+
+    return $block;
+}
+
+?>

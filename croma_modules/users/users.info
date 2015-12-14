@@ -1,0 +1,6 @@
+name = Users
+description = "Module for managing CROMA users"
+package = CROMA	    
+core = "7.x"
+stylesheets[all][] = users.css
+scripts[] = users.js

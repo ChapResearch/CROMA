@@ -1,0 +1,6 @@
+name = Media
+description = "Module for managing CROMA media"
+package = CROMA	    
+core = "7.x"
+stylesheets[all][] = media.css
+scripts[] = media.js

@@ -1,0 +1,6 @@
+name = Notifications
+description = "Module for managing CROMA notifications"
+package = CROMA	    
+core = "7.x"
+stylesheets[all][] = notifications.css
+scripts[] = notifications.js

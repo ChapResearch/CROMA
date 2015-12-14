@@ -1,0 +1,102 @@
+<?php  
+
+/* db_createOutreachTable() - creates the table of outreach events, which includes information entered at all stages of an outreach event (planning, during and post-mortem).
+*/ 
+function db_createOutreachTable($con)
+{
+
+  $sql="CREATE TABLE outreach
+                  (
+                    OID               INT           NOT NULL PRIMARY KEY AUTO_INCREMENT,  
+                    name              CHAR(50)      NOT NULL,
+                    description       VARCHAR(300)  ,
+                    logDate           DATETIME      NOT NULL, # note that the time(s) of the event are separate
+                    peopleImpacted    INT           ,
+                    testimonial       VARCHAR(300)  ,
+                    type              CHAR(20)      ,
+                    TID               INT           NOT NULL,
+                    status            CHAR(20)      , # can be isIdea, isOutreach, doingWriteUp or locked
+                    co_organization   CHAR(20)      ,
+                    co_position       CHAR(20)      ,
+                    co_firstName      CHAR(30)      ,
+                    co_lastName       CHAR(30)      ,
+                    co_email          CHAR(30)      ,
+                    co_phoneNumber    CHAR(20)      ,
+                    city              CHAR(25)      ,
+                    state             CHAR(25)      ,
+                    address           CHAR(30)      ,
+                    country           CHAR(25)      ,
+                    peopleReached     INT           ,
+                    cancelled         BOOLEAN  
+                )";
+   if(!execute($con,$sql,"Table 'users' create")) {
+       return (false);
+     }
+     return (true);
+}
+
+/* db_createMediaTable() - creates the table of media, which includes information of assigning pictures to outreach events. 
+*/
+function db_createMediaTable($con)
+{
+
+  $sql="CREATE TABLE media
+                  (
+                    MID               INT           NOT NULL PRIMARY KEY AUTO_INCREMENT,  
+                    OID               INT           ,
+                    UID               INT           ,
+                    TID               INT           ,
+                    title             CHAR(30)      ,
+                    description       CHAR(50)      ,
+                    link              CHAR(25)      ,
+                    isPicture         BOOLEAN       ,
+                    isApproved        BOOLEAN  
+                  )";
+  if(!execute($con,$sql,"Table 'media' create")) {
+       return (false);
+     }
+     return (true);
+}  
+
+/* db_createHourCountingTable() - creates the table to count hours, which includes information for individual users.
+*/
+function db_createHourCountingTable($con)
+{
+
+  $sql="CREATE TABLE hourCounting
+                 (
+                   HID               INT            NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+                   UID               INT            NOT NULL,
+                   OID               INT            NOT NULL,
+                   numberOfHours     INT            NOT NULL,
+                   description       VARCHAR(100)           ,
+                   type              CHAR(30)                                
+                 )"; 
+  if(!execute($con,$sql,"Table 'hourCounting' create")) {
+       return (false);
+    }
+     return (true);
+}
+
+/*  db_createUsersVsOutreachTable
+ */
+function db_createUsersVsOutreachTable($con)
+{
+
+  $sql="CREATE TABLE usersVsOutreach
+                (
+                  UOID               INT            NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                  UID                INT            NOT NULL,
+                  OID                INT            NOT NULL,
+                  isHelpingPrep      BOOLEAN        ,
+                  isGoingToEvent     BOOLEAN        ,
+                  isDoingWriteUp     BOOLEAN        ,
+                  isOwner            BOOLEAN        #indicates that the person created the event
+                )";
+  if(!execute($con, $sql,"Table 'usersVsOutreach' create")) {
+        return (false);
+      }
+      return (true);
+}       
+ 
+?>

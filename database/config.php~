@@ -1,0 +1,8 @@
+<?php
+
+define('DB_HOST', 'localhost');
+define('DB_DATABASE', 'cromaTest');
+define('DB_USERNAME', 'croma');
+define('DB_PASSWORD', 'tiger6710');
+
+?>

@@ -1,0 +1,82 @@
+//
+// For the click on row stuff
+// this was HARD to find - I found it at: http://codekarate.com/blog/adding-javascript-your-drupal-7-module
+//
+// NOT the row highlighting part, but the behaviors part
+//
+// For the expanding part: https://www.drupal.org/node/2028747
+//
+(function ($) {
+  Drupal.behaviors.contact = {
+    attach: function (context, settings) {
+	$('.contact-link-block').click(
+		function() { if($(this).find('a').length) { window.location = $(this).find('a').attr('href'); } }
+	);
+    }
+  };
+
+  Drupal.behaviors.profile = {
+    attach: function (context, settings) {
+	$('table.cases-user-entry').click(
+		function() { if($(this).find('a').length) { window.location = $(this).find('a').attr('href'); } }
+	);
+    }
+  };
+
+  Drupal.behaviors.cases = {
+    attach: function (context, settings) {
+	$('tr.cases-list-row').click(
+	    function() { window.location = $(this).find('a').attr('href'); }
+	);
+    }
+  };
+
+  Drupal.behaviors.cases2 = {
+    attach: function (context, settings) {
+	$(".cases-roles-table tr:not(.cases-roles-main)").hide();
+	$(".cases-roles-table tr.cases-roles-main").click(function(){
+	    $(this).nextUntil("tr.cases-roles-main").fadeToggle("fast");
+	});
+	    // .eq(0).trigger('click');
+    }
+  };
+
+  Drupal.behaviors.cases3 = {
+    attach: function (context, settings) {
+	$(".cases-table tr:not(.cases-table-main)").hide();
+	$(".cases-table tr.cases-table-main").click(function(){
+	    $(this).nextUntil("tr.cases-table-main").fadeToggle("fast");
+	});
+	    // .eq(0).trigger('click');
+    }
+  };
+
+  Drupal.behaviors.cases4 = {
+    attach: function (context, settings) {
+	$('tr.outapps-list-row').click(
+	    function() { window.location = $(this).find('a').attr('href'); }
+	);
+    }
+  };
+
+  Drupal.behaviors.cases5 = {
+    attach: function (context, settings) {
+	$('tr.cases-profile-navigation').click(
+	    function() { window.location = $(this).find('a').attr('href'); }
+	);
+    }
+  };
+
+  Drupal.behaviors.stages = {
+    attach: function (context, settings) {
+//	$(".cases-stage-fieldset div.cases-stage-content").hide();
+	$(".cases-stage-fieldset legend").click(function(){
+	  $(this).next().fadeToggle("fast");
+//	  $(this).children("div").fadeToggle("fast");
+	});
+	    // .eq(0).trigger('click');
+    }
+  };
+
+}(jQuery));
+

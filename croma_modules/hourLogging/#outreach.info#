@@ -1,0 +1,7 @@
+
+name = Outreach
+description = "Module for managing CROMA outreach"
+package = CROMA	    
+core = "7.x"
+stylesheets[all][] = outreach.css
+scripts[] = outreach.js
