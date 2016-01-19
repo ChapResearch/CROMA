@@ -21,7 +21,8 @@ $formBlocks = array(
 
 $otherBlocks = array(array("id" => "outreach_view", "title" => "CROMA - View Outreach", "content" => "viewUpcomingOutreach"),
 		     array("id" => "viewTeamOutreach", "title" => "CROMA - View Team Outreach", "content" => "viewTeamOutreach"),
-		     array("id" => "ideas_view", "title" => "CROMA - View Outreach Ideas", "content" => "viewOutreachIdeas")); 
+		     array("id" => "ideas_view", "title" => "CROMA - View Outreach Ideas", "content" => "viewOutreachIdeas"),
+		     array("id" => "viewOutreach", "title" => "CROMA - View Outreach Event", "content" => "viewOutreachEvent")); 
 
 global $outreachBlockInfo;
 global $outreachBlockViewFns;

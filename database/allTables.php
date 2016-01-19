@@ -9,10 +9,10 @@ function db_createOutreachTable($con)
                   (
                     OID               INT           NOT NULL PRIMARY KEY AUTO_INCREMENT,  
                     name              CHAR(50)      NOT NULL,
-                    description       VARCHAR(300)  ,
+                    description       VARCHAR(999)  ,
                     logDate           DATETIME      NOT NULL, # note that the time(s) of the event are separate
                     peopleImpacted    INT           ,
-                    testimonial       VARCHAR(300)  ,
+                    testimonial       VARCHAR(999)  ,
                     type              CHAR(20)      ,
                     TID               INT           NOT NULL,
                     status            CHAR(20)      , # can be isIdea, isOutreach, doingWriteUp or locked
@@ -26,8 +26,9 @@ function db_createOutreachTable($con)
                     state             CHAR(25)      ,
                     address           CHAR(30)      ,
                     country           CHAR(25)      ,
-                    peopleReached     INT           ,
-                    cancelled         BOOLEAN  
+                    totalAttendance   INT           , # replaced total people reached, shows how many people actually attended the event and were present  
+                    cancelled         BOOLEAN       ,
+                    picture           INT           
                 )";
    if(!execute($con,$sql,"Table 'outreach' create")) {
        return (false);
@@ -109,7 +110,8 @@ function db_createProfilesTable($con)
 
   $sql="CREATE TABLE profiles
                   (
-                    UID            INT           NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+                    PID            INT           NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+                    UID            INT           , # key to Drupal user
                     firstName      CHAR(20)      NOT NULL,
                     lastName       CHAR(20)      NOT NULL,
                     FID            INT           , # key for profile picture
@@ -142,7 +144,7 @@ function db_createTeamsTable($con)
                    type             CHAR(10)   ,
                    country          CHAR(25)   ,
                    isApproved       BOOLEAN    ,
-                   MID              INT        , # key to media table (gets logo or whatever)
+                   FID              INT        , # key to drupal file containing picture
                    isActive         BOOLEAN    
                    )";
 

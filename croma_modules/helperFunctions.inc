@@ -325,4 +325,101 @@ function getFields($fields, $array)
   return array_intersect_key($array, array_flip($fields));
 }
 
+/* orderByValue() - orders a multidimensional array by the given $orderParam. Note that the array is passed by reference, and therefore only true/false is returned by the function (indicating success/failure).
+Ex: 
+$array = new array(
+new array('test'=>'a', 'test2'=>1),
+new array('test'=>'c', 'test2'=>3),
+new array('test'=>'b', 'test2'=>2),
+);
+orderByValue($array, 'test', false);
+*/
+function orderByValue(&$array, $orderParam, $isAscending = false)
+{
+  // custom sort function using an anonymous PHP function
+  $compare = function($a, $b) use ($orderParam, $isAscending){
+    if (is_numeric($a[$orderParam])){
+      if ($a[$orderParam] == $b[$orderParam]){
+	return 0;
+      }
+      if ($isAscending) {
+	return $a[$orderParam] < $b[$orderParam] ? -1 : 1;
+      } else {
+	return $a[$orderParam] < $b[$orderParam] ? 1 : -1; // sorts in reverse
+      }
+    } else { // meant to compare strings
+      if ($isAscending) {
+	return strcmp($a[$orderParam],$b[$orderParam]);
+      } else {
+	return strcmp($b[$orderParam],$a[$orderParam]); // sorts in reverse
+      }
+    }
+  };
+  return usort($array, $compare);
+}
+
+// TODO - comment
+
+function sortHeader ($orderParam, $showAll, $isAscending, $label, $field, $page)
+{
+  $retVal = "<a href=\"?q=$page&sort=$field";
+  if ($showAll) {
+    $retVal .= "&showAll";
+  }
+  if ($orderParam == $field && !$isAscending) { // if the user has "double clicked"
+    $retVal .= "&isAscending";
+  }
+  if ($orderParam == $field){
+    $retVal .= "\"><b>$label</b></a>"; // make the link bold if the current sort
+  } else {
+    $retVal .= "\">$label</a>";
+  }
+
+  return $retVal;
+}
+
+
+/* showAllButton() - much like showHeader() compose a piece of HTML for to allow the user to click to include/exclude data in the table.
+*/
+function showAllButton($page,$sort,$reverse,$all, $showText, $hideText)
+{
+     $retVal = "<a href=\"?q=$page&sort=$sort";
+
+     if($reverse) {
+	  $retVal .= "&isAscending";
+     }
+
+     if(!$all) {
+	  $retVal .= "&showAll";
+     }
+
+     $retVal .= '"><button type="button">';
+     if($all) {
+       $retVal .= $hideText;
+     } else {
+       $retVal .= $showText;
+     }
+
+     $retVal .= '</button></a>';
+
+     return($retVal);
+}
+
+// TODO - comment
+
+function chopString($str,$length)
+{
+
+  $finalString = "";
+
+  if(strlen($str)>$length)
+    {
+      $finalString .= substr($str,0,$length);
+      return $finalString . "...";
+
+    }
+
+  else return $str;
+}
+
 ?>

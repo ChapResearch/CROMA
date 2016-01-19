@@ -61,4 +61,12 @@ function hourLogging_block_view($delta = '')
     return $block;
 }
 
+function hourLogging_permission() {
+  return array(
+	       'access current_posts content' => array(
+						       'title' => t('Access content for the Current posts module'),
+						       )
+	       );
+}
+
 ?>

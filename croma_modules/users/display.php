@@ -12,8 +12,9 @@ include_once("/var/www-croma/croma_modules/blockSupport.php");
 include_once("/var/www-croma/database/croma_dbFunctions.php");
 include_once("/var/www-croma/croma_modules/users/philipDisplay.php");
 include_once("/var/www-croma/croma_modules/users/shreyDisplay.php");
+include_once("/var/www-croma/croma_modules/users/parkerDisplay.php");
 
-$formBlocks = array(array("id" => "addUser", "title" => "CROMA - Add User", "form" => "addUser"));
+$formBlocks = array(array("id" => "profileForm", "title" => "CROMA - Create/Edit Profile", "form" => "profileForm"));
 
 $otherBlocks = array(array("id" => "viewUser", "title" => "CROMA - View User", "content" => "viewUser"),
 		     array("id" => "viewUsersInTeam", "title" => "CROMA - View Users For Team", "content" => "showUsersForTeam"));
@@ -23,4 +24,3 @@ global $usersBlockViewFns;
 
 blockLoadForms($usersBlockInfo,$usersBlockViewFns,$formBlocks);  
 blockLoadOther($usersBlockInfo,$usersBlockViewFns,$otherBlocks);  
-

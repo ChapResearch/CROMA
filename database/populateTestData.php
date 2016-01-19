@@ -4,15 +4,15 @@ include_once("croma_dbFunctions.php");
 
 function populateTestData()
 {
-  dbCreateTeam(array("name" => "Team Appreciate", "number" => "2468", "type" => "FRC", "city" => "1000 Westbank Austin TX 78746", "state" => "Texas", "country" => "United States", "MID" => "1", "isActive" => true));
-  dbCreateTeam(array("name" => "The Poofs", "number" => "254", "MID" => "4", "isActive" => true));
-  dbCreateTeam(array("name" => "RobotTots", "number" => "118", "MID" => "3", "isActive" => true));
-  dbCreateTeam(array("name" => "Katies Team", "number" => "3310", "MID" => "2", "isActive" => true));
+  dbCreateTeam(array("name" => "Team Appreciate", "number" => "2468", "type" => "FRC", "city" => "1000 Westbank Austin TX 78746", "state" => "Texas", "country" => "United States", "isActive" => true));
+  dbCreateTeam(array("name" => "The Poofs", "number" => "254", "isActive" => true));
+  dbCreateTeam(array("name" => "RobotTots", "number" => "118", "isActive" => true));
+  dbCreateTeam(array("name" => "Katies Team", "number" => "3310", "isActive" => true));
 
-  dbCreateUser(array("firstName"=>"Philip", "lastName"=>"Liu", "bio"=>"Philip Liu is a sophomore at Westlake High School. He has been highly involved with STEM programs since a young age and has developed many skills such as leadership, communication, and perseverance. In Chap Research, Philip is currently working on two different projects. The first is an all hardware project called the Chap Measuring Press (CMP) while the second is the Chap Research Outreach Management Application (CROMA). He is a member of FRC 2468 Team Appreciate and works in many sub-systems. In addition to working with the robot design, CAD, and manufacturing, he manages the documentation and portfolio for the outreach team. With all these generous opportunities, he uses his knowledge (so far) to mentor FTC teams. Outside of robotics and school, Philip practices TaeKwonDo (a soon-to-be instructor), dances, and plays football, basketball, and fantasy with his friends. In order to balance his time with a laughing and happy manner, his favorite quote is 'where there is a will, there is a way.'", "position"=>"CROMA Admin", "phone"=>"512-925-2241", "grade"=>"10", "gender"=>"Male"));
-  dbCreateUser(array("firstName"=>"Parker", "lastName"=>"Bergen"));
-  dbCreateUser(array("firstName"=>"Rachel", "lastName"=>"Gardner"));
-  dbCreateUser(array("firstName"=>"Lewis", "lastName"=>"Jones"));
+  dbCreateProfile(array("firstName"=>"Philip", "lastName"=>"Liu", "bio"=>"Philip Liu is a sophomore at Westlake High School. He has been highly involved with STEM programs since a young age and has developed many skills such as leadership, communication, and perseverance. In Chap Research, Philip is currently working on two different projects. The first is an all hardware project called the Chap Measuring Press (CMP) while the second is the Chap Research Outreach Management Application (CROMA). He is a member of FRC 2468 Team Appreciate and works in many sub-systems. In addition to working with the robot design, CAD, and manufacturing, he manages the documentation and portfolio for the outreach team. With all these generous opportunities, he uses his knowledge (so far) to mentor FTC teams. Outside of robotics and school, Philip practices TaeKwonDo (a soon-to-be instructor), dances, and plays football, basketball, and fantasy with his friends. In order to balance his time with a laughing and happy manner, his favorite quote is 'where there is a will, there is a way.'", "position"=>"CROMA Admin", "phone"=>"512-925-2241", "grade"=>"10", "gender"=>"Male"));
+  dbCreateProfile(array("firstName"=>"Parker", "lastName"=>"Bergen"));
+  dbCreateProfile(array("firstName"=>"Rachel", "lastName"=>"Gardner"));
+  dbCreateProfile(array("firstName"=>"Lewis", "lastName"=>"Jones"));
 
   dbAssignUserToTeam("2","1");
   dbAssignUserToTeam("1","1");

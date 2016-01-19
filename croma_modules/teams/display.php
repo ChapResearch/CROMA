@@ -13,11 +13,10 @@ include_once("/var/www-croma/database/croma_dbFunctions.php");
 include_once("/var/www-croma/croma_modules/teams/williamDisplay.php");
 
 $formBlocks = array(
-    array("id" => "addTeam", "title" => "CROMA - Add Team", "form" => "addTeam")
+    array("id" => "teamForm", "title" => "CROMA - Add/Edit Team", "form" => "teamForm")
 );
 
-$otherBlocks = array(array("id" => "viewTeam", "title" => "CROMA - View Team", "content" => "viewTeam"),
-		     array("id" => "viewOutreachForTeam", "title" => "CROMA - View Outreach For Team", "content" => "viewTeamOutreach"));
+$otherBlocks = array(array("id" => "viewTeam", "title" => "CROMA - View Team", "content" => "viewTeam"));
 
 global $teamsBlockInfo;
 global $teamsBlockViewFns;
