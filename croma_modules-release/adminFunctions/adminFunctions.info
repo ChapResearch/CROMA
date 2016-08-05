@@ -1,0 +1,5 @@
+name = Admin Functions
+description = "Module for adding the admin UI and capabilities"
+package = CROMA	    
+core = "7.x"
+

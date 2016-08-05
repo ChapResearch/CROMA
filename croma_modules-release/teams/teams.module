@@ -1,0 +1,163 @@
+<?php
+/**
+ * @file
+ * This is the main module file.
+ */
+
+include_once("teams.inc");
+$upOne = realpath(dirname(__FILE__) . '/..');
+include_once($upOne.'/includePaths.inc');
+include_once(MODULES_FOLDER."/blockSupport.php");
+
+// $blockInfo - an array of info that is passed to Drupal
+//      when it asks about the module.
+//
+// $blockViewFns - an array of functions that are called
+//      when Drupal calls *_block_view();
+//
+
+global $teamsBlockInfo;
+global $teamsBlockViewFns;
+
+$teamsBlockInfo = array();
+$teamsBlockViewFns = array();
+
+include_once("teams_display.php");
+
+/*
+  Implements hook_help().
+*/
+function teams_help($path, $arg) {
+
+  if ($path == 'admin/help#rupalform') {
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The hour logging module manages hour logging in CROMA.') . '</p>';
+    return $output;
+  }
+}
+
+//
+// provide information about the blocks that this module provides
+//
+function teams_block_info()
+{
+    global $teamsBlockInfo;
+
+    return($teamsBlockInfo);
+}
+
+//
+// hook in the blocks
+//
+function teams_block_view($delta = '')
+{
+    global $teamsBlockViewFns;
+
+    $block = array();
+
+    if(array_key_exists($delta,$teamsBlockViewFns)) {
+      $teamsBlockViewFns[$delta]($block);
+    }
+
+    return $block;
+}
+
+function teams_menu() {
+  $items['switchTeam'] = array(
+				  'page callback' => 'switchTeam',
+				  'access callback' => TRUE,
+				  'type' => MENU_CALLBACK,
+				  );
+
+  $items['leaveTeam'] = array(
+				  'page callback' => 'leaveTeam',
+				  'page arguments' => array(1),
+				  'access callback' => TRUE,
+				  'type' => MENU_CALLBACK,
+				  );
+
+  $items['rescindTeamApplication'] = array(
+				  'page callback' => 'rescindTeamApplication',
+				  'page arguments' => array(1),
+				  'access callback' => TRUE,
+				  'type' => MENU_CALLBACK,
+				  );
+
+  $items['makeTeamDefault'] = array(
+				  'page callback' => 'makeTeamDefault',
+				  'page arguments' => array(1),
+				  'access callback' => TRUE,
+				  'type' => MENU_CALLBACK,
+				  );
+
+  $items['approveUser'] = array(
+				  'page callback' => 'approveUser',
+				  'page arguments' => array(1,2),
+				  'access callback' => 'hasPermissionForTeam',
+				  'access arguments' => array('manageTeamMembers', 2),
+				  'type' => MENU_CALLBACK,
+				  );
+
+  $items['rejectUser'] = array(
+				  'page callback' => 'rejectUser',
+				  'page arguments' => array(1,2),
+				  'access callback' => 'hasPermissionForTeam',
+				  'access arguments' => array('manageTeamMembers', 2),
+				  'type' => MENU_CALLBACK,
+				  );
+
+  $items['kickUserFromTeam'] = array(
+				  'page callback' => 'kickUserFromTeam',
+				  'access callback' => 'hasPermissionForTeam',
+				  'access arguments' => array('manageTeamMembers', 2),
+				  'page arguments' => array(1,2),
+				  'type' => MENU_CALLBACK,
+				  );
+  return $items;
+}
+
+function teams_mail($key, &$message, $params)
+{
+  $message['body'] = generateMailHeader();  
+
+  switch($key) {
+  case 'teamCreated':
+    $message['subject'] = "New Team Created with CROMA";
+    $message['body'] .= "\"{$params['userName']}\" has created a new team, Team {$params['number']} \"{$params['name']}\".<br>";
+    $message['body'] .= "UID: {$params['user']}<br>";
+    $message['body'] .= "TID: {$params['TID']}<br>";
+    $message['body'] .= 'Visit the admin page <a href="http://croma.chapresearch.com';
+    $message['body'] .= PORT. "/?q=adminPage\">here</a> to approve/deny the team.";
+    break;
+  case 'teamDeleted':
+    $message['subject'] = "Team {$params['teamName']} Deleted from CROMA";
+    $message['body'] .= "\"{$params['userName']}\" has just deleted team {$params['teamNumber']} \"{$params['teamName']}\".<br>";
+    $message['body'] .= "Feedback:<br>{$params['feedback']}";
+    break;
+  case 'becameOwner':
+    $message['subject'] = "Congrats! You Are Now the Owner of {$params['teamName']}!";
+    $message['body'] .= "Dear {$params['newOwnerName']},<br>";
+    $message['body'] .= "{$params['oldOwnerName']} has just transferred ownership of {$params['teamName']} to you on CROMA. You now have full permissions within the team, and {$params['oldOwnerName']} has been made a team admin. If you believe you have become the owner in error, you may click <a href=\"?q=transferTeamOwnership&TID={$params['TID']}\">here</a> to transfer ownership back to {$params['oldOwnerName']} and/or click <a href=\"mailto:{$params['oldOwnerEmail']} target=\"_blank\">here</a> to send him/her email at {$params['oldOwnerEmail']}.<br><br>";
+    $message['body'] .= "Sincerely,<br>";
+    $message['body'] .= "The CROMA Team<br>";
+    break;
+  case 'approvedForTeam':
+    $message['subject'] = "You Have Been Approved for a Team";
+    $message['body'] .= "Dear {$params['fullName']},<br>";
+    $message['body'] .= "You have been added to \"{$params['teamName']}\"!<br><br>";
+    $message['body'] .= "Sincerely,<br>";
+    $message['body'] .= "The CROMA Team<br>";
+    break;
+  case 'rejectedFromTeam':
+    $message['subject'] = "You Have Been Denied By a Team";
+    $message['body'] .= "Dear {$params['fullName']},<br>";
+    $message['body'] .= "Unfortunately, your application to \"{$params['teamName']}\" has been turned down.";
+    $message['body'] .= "If you feel this was in error, please contact the team's administrator(s).<br><br>";
+    $message['body'] .= "Sincerely,<br>";
+    $message['body'] .= "The CROMA Team<br>";
+    break;
+  }
+
+  $message['body'] .= generateMailFooter();
+}
+?>

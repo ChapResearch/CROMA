@@ -1,0 +1,6 @@
+name = Teams
+description = "Module for managing CROMA teams"
+package = CROMA	    
+core = "7.x"
+stylesheets[all][] = teams.css
+scripts[] = teams.js

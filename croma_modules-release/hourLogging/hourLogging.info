@@ -1,0 +1,6 @@
+name = Hour Logging
+description = "Module for managing CROMA hour counting"
+package = CROMA	    
+core = "7.x"
+stylesheets[all][] = croma_style.css
+scripts[] = hourLogging.js

@@ -1,0 +1,108 @@
+<?php
+/**
+ * @file
+ * This is the main module file.
+ */
+
+include_once("media.inc");
+$upOne = realpath(dirname(__FILE__) . '/..');
+include_once($upOne.'/includePaths.inc');
+include_once(MODULES_FOLDER."/blockSupport.php");
+include_once(MODULES_FOLDER."/media/getIncomingMedia.php");
+
+// $blockInfo - an array of info that is passed to Drupal
+//      when it asks about the module.
+//
+// $blockViewFns - an array of functions that are called
+//      when Drupal calls *_block_view();
+//
+
+global $mediaBlockInfo;
+global $medaBlockViewFns;
+
+$mediaBlockInfo = array();
+$mediaBlockViewFns = array();
+
+include_once("media_display.php");
+
+/*
+  Implements hook_help().
+*/
+function media_help($path, $arg) {
+
+  if ($path == 'admin/help#rupalform') {
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The media module manages media in CROMA.') . '</p>';
+    return $output;
+  }
+}
+
+//
+// provide information about the blocks that this module provides
+//
+function media_block_info()
+{
+    global $mediaBlockInfo;
+
+    return($mediaBlockInfo);
+}
+
+//
+// hook in the blocks
+//
+function media_block_view($delta = '')
+{
+    global $mediaBlockViewFns;
+
+    $block = array();
+
+    if(array_key_exists($delta,$mediaBlockViewFns)) {
+        $mediaBlockViewFns[$delta]($block);
+    }
+
+    return $block;
+}
+
+function media_menu()
+{
+  global $user;
+
+  $items['removeMedia'] = array(
+  				  'page callback' => 'removeMediaFromMID',
+                                  'page arguments' => array(1,2),
+                                  'access callback' => 'isMyMedia',
+                                  'access arguments' => array(1),
+                                  'type' => MENU_CALLBACK,
+				  );
+
+  $items['remoteMediaUpload'] = array(
+				  'page callback' => 'remoteMediaUpload',
+				  'access callback' => TRUE,
+				  'type' => MENU_CALLBACK,
+				  );
+  return $items;
+
+}
+
+/*function media_cron()
+{
+  // Default to an hourly interval. Of course, cron has to be running at least
+   // hourly for this to work.
+  $interval = variable_get('media_interval', 30);
+  // We usually don't want to act every time cron runs (which could be every
+  // minute) so keep a time for the next run in a variable.
+  if (time() >= variable_get('media_next_execution', 0)) {
+    // This is a silly example of a cron job.
+    // It just makes it obvious that the job has run without
+    // making any changes to your database.
+    watchdog('media', 'media just ran');
+    watchdog('media', 'My message, this is my node title');
+    drupal_set_message(t('media executed at %time', array('%time' => date_iso8601(time(0)))));
+    getIncomingMedia();
+    variable_set('media_next_execution', time() + $interval);
+  }
+
+  }*/
+
+
+?>

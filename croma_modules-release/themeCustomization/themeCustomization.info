@@ -1,0 +1,5 @@
+name = Theme Customization
+description = "Module for customizing the theme (aka just a CSS file)"
+package = CROMA	    
+core = "7.x"
+stylesheets[all][] = style.css

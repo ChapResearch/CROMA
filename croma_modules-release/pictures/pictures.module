@@ -1,0 +1,63 @@
+<?php
+/**
+ * @file
+ * This is the main module file.
+ */
+
+$upOne = realpath(dirname(__FILE__) . '/..');
+include_once($upOne.'/includePaths.inc');
+include_once(MODULES_FOLDER."/blockSupport.php");
+
+// $blockInfo - an array of info that is passed to Drupal
+//      when it asks about the module.
+//
+// $blockViewFns - an array of functions that are called
+//      when Drupal calls *_block_view();
+//
+
+global $picturesBlockInfo;
+global $picturesBlockViewFns;
+
+$picturesBlockInfo = array();
+$picturesBlockViewFns = array();
+
+include_once("pictures_display.php");
+
+/*
+  Implements hook_help().
+*/
+function pictures_help($path, $arg) {
+
+  if ($path == 'admin/help#rupalform') {
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The pictures module manages pictures in CROMA.') . '</p>';
+    return $output;
+  }
+}
+
+//
+// provide information about the blocks that this module provides
+//
+function pictures_block_info()
+{
+    global $picturesBlockInfo;
+
+    return($picturesBlockInfo);
+}
+
+//
+// hook in the blocks
+//
+function pictures_block_view($delta = '')
+{
+    global $picturesBlockViewFns;
+
+    $block = array();
+
+    if(array_key_exists($delta,$picturesBlockViewFns)) {
+      $picturesBlockViewFns[$delta]($block);
+    }
+
+       return $block;
+}
+?>

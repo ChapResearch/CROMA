@@ -1,0 +1,4 @@
+name = Pictures
+description = "Module for managing CROMA pictures"
+package = CROMA	    
+core = "7.x"

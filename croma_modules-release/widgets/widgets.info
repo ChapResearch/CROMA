@@ -1,0 +1,5 @@
+name = Widgets
+description = "Module for managing CROMA widgets"
+package = CROMA	    
+core = "7.x"
+stylesheets[all][] = widgets.css

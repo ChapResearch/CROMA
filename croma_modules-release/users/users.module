@@ -1,0 +1,103 @@
+<?php
+/**
+ * @file
+ * This is the main module file.
+ */
+
+include_once("users.inc");
+$upOne = realpath(dirname(__FILE__) . '/..');
+include_once($upOne.'/includePaths.inc');
+include_once(MODULES_FOLDER."/blockSupport.php");
+
+// $blockInfo - an array of info that is passed to Drupal
+//      when it asks about the module.
+//
+// $blockViewFns - an array of functions that are called
+//      when Drupal calls *_block_view();
+//
+
+global $usersBlockInfo;
+global $usersBlockViewFns;
+
+$usersBlockInfo = array();
+$usersBlockViewFns = array();
+
+include_once("users_display.php");
+
+/*
+  Implements hook_help().
+*/
+function users_help($path, $arg) {
+
+  if ($path == 'admin/help#rupalform') {
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The hour logging module manages hour logging in CROMA.') . '</p>';
+    return $output;
+  }
+}
+
+//
+// provide information about the blocks that this module provides
+//
+function users_block_info()
+{
+    global $usersBlockInfo;
+
+    return($usersBlockInfo);
+}
+
+//
+// hook in the blocks
+//
+function users_block_view($delta = '')
+{
+    global $usersBlockViewFns;
+
+    $block = array();
+
+    if(array_key_exists($delta,$usersBlockViewFns)) {
+      $usersBlockViewFns[$delta]($block);
+    }
+
+    return $block;
+}
+
+function users_form_alter(&$form, &$form_state, $form_id)
+{
+  switch($form_id){
+  case 'user_login':
+  case 'user_login_block':
+    array_unshift($form['#validate'],'CROMA_custom_login_validate');
+  }
+}
+
+function CROMA_custom_login_validate($form, $form_state)
+{
+  if (!empty($form_state['values']['name']) && user_is_blocked($form_state['values']['name'])) {
+    form_set_error('name', t('The user %name has been removed from CROMA. Please <a href="?q=contact">contact</a> the CROMA team if you would like to recover this account.', array('%name' => $form_state['values']['name'])));
+  }
+}
+
+function users_mail($key, &$message, $params)
+{
+  $message['body'] = generateMailHeader();  
+
+  switch($key) {
+  case 'userDeleted':
+    $message['subject'] = "User \"{$params['userName']}\" Has Left CROMA";
+    $message['body'] .= "\"{$params['userName']}\" has left CROMA.<br>";
+    $message['body'] .= "Feedback: {$params['feedback']}<br>";
+    break;
+  case 'userCreated':
+    $message['subject'] = "You Have Been Invited to CROMA!";
+    $message['body'] .= "Team \"{$params['teamName']}\" has just invited you to join its team on CROMA.<br>";
+    $message['body'] .= "Click <a href=\"{$params['url']}\">here</a> to activate your account.<br><br>";
+    $message['body'] .= "Sincerely,<br>";
+    $message['body'] .= "The CROMA Team";
+    break;
+  }
+
+  $message['body'] .= generateMailFooter();
+}
+
+?>
