@@ -1,0 +1,493 @@
+body {
+  margin:0;
+  padding:0;
+  color:#000000;
+  background-color:#ffffff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  background-repeat:repeat-x;
+  background-position:top;
+}
+
+button {
+  color: #ffffff;
+  background: #27408b;
+  border-top: none;
+  border-right: none;
+  border-left:  none;
+  border-bottom: none;
+  margin: 2px;
+  padding: 4px 4px 4px 4px;
+  font-size: 14px;
+  font-family: 'Open Sans', sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   border-radius: 3px;
+}
+
+button:hover {
+  color: #ffffff;
+  background: #476AD1;
+  text-decoration: none;
+}
+
+button:disabled {
+  color: #ffffff;
+  background: #808080;
+  text-decoration: none;
+}
+
+button.largeButton {
+    color: #ffffff;
+    background: #27408B;
+    padding:4px 60px 4px 60px;
+}
+
+button.largeButton:hover {
+  color: #ffffff;
+  background: #476AD1;
+}
+
+.ajax-progress .message {
+    display:none;
+}
+
+div#menu-bar-wrapper nav#block-superfish-2{
+  float: right;
+}
+
+div#menu-bar-wrapper section#block-themecustomization-displayhelp{
+  float: right;
+}
+
+div#menu-bar-wrapper div#block-notifications-menubarnotification{
+  float: right;
+}
+
+tbody{
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: none;
+}
+
+table.infoTable tr:nth-child(even){
+    background-color: #fbfbfb;
+    border: 1px solid #e1e1e2;
+    border-bottom: none;
+    border-collapse: collapse; 
+}
+
+table.infoTable tr:nth-child(odd){
+    border: 1px solid #e1e1e2;
+    border-bottom: none;
+    border-collapse: collapse; 
+}
+
+table.infoTable tr:last-child{
+    border-bottom: 1px solid #e1e1e2;
+}
+
+table.infoTable tr:not(:first-child):hover{
+    width: 100%;
+    border: 1px solid #8E2115; 
+    border-collapse: collapse;
+}
+
+table.infoTable tr th td button {
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: none;
+}
+
+#content-style{
+    background-color: #27408B;
+}
+
+img#notificationPhoto{
+width: 100%;
+height: auto;
+}
+
+input.form-button,
+input.form-submit {
+  color: #ffffff;
+  background: #27408b;
+  border-top: 2px solid #ffffff;
+  border-right: none;
+  border-left: none;
+  border-bottom: none;
+  margin-left: 2px;
+  padding: 4px 4px 4px 4px;
+  font-size: 14px;
+  font-family: 'Open Sans', sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   border-radius: 3px;
+}
+
+input.form-button:hover,
+input.form-submit:hover,
+input.form-button:focus,
+input.form-submit:focus {
+  color: #ffffff;
+  background: #8E5015;
+  text-decoration: none;
+}
+
+input#edit-submit {
+    border-top: 2px solid #ffffff;
+    border-right: none;
+    border-left: 2px solid #ffffff;
+    border-bottom: none;
+}
+
+input#edit-delete,
+input#edit-remove,
+input#edit-cancel,
+button#deleteTeamManageUserTeamsButton,
+button#deleteMediaButton,
+button#deleteNotification,
+input#edit-deleteprofile{
+    background:#8E2115;
+}
+
+a.menu_icon.menu-497.sf-depth-1.active{
+    background-color:#000000;
+}
+
+div#branding{
+    padding: 0;
+}
+
+div#messages-help-wrapper{
+    position: relative;
+    top: 20px;
+}
+
+#block-outreach-searchformsidebar{
+    border-collapse: separate; 
+    background-color: #fbfbfb; 
+    border: 1px solid #e1e1e2;
+
+}
+
+table#outreachPageHeader{
+    border-collapse: separate; 
+    border-spacing: 15px 20px;
+    background-color: #fbfbfb; 
+    border: 1px solid #e1e1e2;
+}
+
+table#teamPageSummary{
+    border-collapse: separate; 
+    border-spacing: 20px 20px;
+    background-color: #fbfbfb; 
+    border: 1px solid #e1e1e2;
+}
+
+table#myStatsOnTeamNumber{
+    border-top: 1px solid #e1e1e2;
+    border-right: 1px solid #e1e1e2;
+    border-left: 1px solid #e1e1e2;
+    border-bottom: 1px solid #e1e1e2;
+    background-color: #fbfbfb; 
+    border-collapse: separate;
+}
+
+table#myTotalStats,
+table#teamStats,
+table#miniViewUser,
+table#viewTeamInfoTable,
+table#teamPhotoOnViewTeam{
+    background-color: #fbfbfb; 
+    border: 1px solid #e1e1e2;
+}
+
+table#miniViewTeam{
+    border-collapse: separate;
+    border-spacing: 0px 15px;
+    background-color: #fbfbfb; 
+    border: 1px solid #e1e1e2;
+}
+
+table#photoAndEdit{
+    border-collapse: collapse;
+    border-spacing: 0px 15px;
+    background-color: #fbfbfb; 
+    border: 1px solid #e1e1e2;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #333333;
+    color: #ffffff;
+    text-align: center;
+    padding: 4px 6px 4px 6px;
+    position: absolute;
+    top: 100%;
+    left: 50%; 
+    margin-top: 12px;
+    margin-left: -66px;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.tooltip .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent #333333 transparent;
+}
+
+table#publicHomePageStatistics{
+    color: #27408B;
+}
+
+.mail {
+    color: red;
+}
+
+select.form-select{
+    margin:0px 0px 0px 0px;
+}
+
+td#myStatsOnMultTeams1, td#myStatsOnMultTeams2{
+    position: relative;
+    right: -18px;
+}
+
+img#homeButtonImg{
+    position: relative;
+    top: 7px;
+    right: -12px;
+    height: 25px;
+}
+
+/* Tool tip to the right*/
+
+.tooltip1 {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip1 .tooltiptext1 {
+    visibility: hidden;
+    width: 120px;
+/*    height: 150px; /* this wasn't here before */
+    background-color: #333333;
+    color: #ffffff;
+    text-align: center;
+    padding: 4px 6px 4px 6px;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 110%;
+
+}
+
+.tooltip1 .tooltiptext1::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #333333 transparent transparent;
+
+
+}
+
+
+/* Tooltip to the left */
+
+.tooltip2 {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip2 .tooltiptext2 {
+    visibility: hidden;
+    width: 120px;
+    background-color: #333333;
+    color: #ffffff;
+    text-align: center;
+    padding: 4px 6px 4px 6px;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    right: 110%;
+
+}
+
+.tooltip2 .tooltiptext2::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent #333333;
+
+
+}
+
+/*Tool tip to the top*/
+
+.tooltip3 {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip3 .tooltiptext3 {
+    visibility: hidden;
+    width: 120px;
+    background-color: #333333;
+    color: #ffffff;
+    text-align: center;
+    padding: 4px 6px 4px 6px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -60px;
+
+}
+
+
+.tooltip3 .tooltiptext3::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333333 transparent transparent transparent;
+
+
+}
+
+/* Tool tip to the bottom*/
+
+.tooltip4 {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip4 .tooltiptext4 {
+    visibility: hidden;
+    width: 120px;
+    background-color: #333333;
+    color: #ffffff;
+    text-align: center;
+    padding: 4px 6px 4px 6px;
+    position: absolute;
+    z-index: 1;
+    top: 150%;
+    left: 50%;
+    margin-left: -60px;
+
+}
+
+.tooltip4 .tooltiptext4::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #333333 transparent;
+}
+
+.trashIcon {
+    max-width:12px; 
+    width:auto; 
+    height:auto; 
+    margin:0px; 
+    padding: 0px 0px 0px 0px
+}
+
+.eventIndicatorIcon {
+    max-width:25px; 
+    width:auto; 
+    height:auto; 
+    padding: 3px 0px 0px 0px
+}
+
+.eventPrivacyIcon {
+    max-width:30px; 
+    width:auto; 
+    height:auto; 
+    padding: 3px 0px 0px 0px
+}
+
+.eventCancelledIcon {
+    max-width:30px; 
+    width:auto; 
+    height:auto; 
+    padding: 3px 0px 0px 0px
+}
+
+.editIcon {
+    max-width:18px; 
+    width:auto; 
+    height:auto; 
+    padding: 0px 0px 0px 0px;
+    margin: 0px;
+}
+
+.helpIcon {
+    width:15px; 
+    margin: 8px 0px 0px 0px
+}
+
+.keyIcon {
+    max-width:14px; 
+    width:auto; 
+    height:auto; 
+    padding: 0px 0px 0px 0px;
+    margin: 0px;
+}
+
+#content-wrapper{
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin-bottom: 100px;
+
+}
+
+#footer-wrapper{
+    background-color: #27408B;
+    margin: 0px;
+    position: fixed;
+    width: 100%;
+    bottom: 0px;
+    height: 105px;
+}
+
+#footer-wrapper>.container{
+    height: 105px;
+}
