@@ -68,18 +68,15 @@ input.form-file,
 #block-search-form input.form-text {
   width: auto;
 }
+
+/* CROMA TEAM EDITING BEGINS HERE */
+/* Removing the background and other CSS from the "input" buttons which interferes with the custom CSS the CROMA team has added in style.css */
 input.form-button,
 input.form-submit {
-/*  background: url(images/button.png) repeat-x left top transparent;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  margin: 0 5px 0 0;
-  padding: 5px 11px;*/
   color: #ffffff;
   background: #27408b;
   border-top: none;
   border-right: none;
-/* border-left: 2px solid #ffffff; */
   border-left: none;
   border-bottom: none;
   padding: 4px 5px 4px 5px;
@@ -91,11 +88,12 @@ input.form-button:hover,
 input.form-submit:hover,
 input.form-button:focus,
 input.form-submit:focus {
-/*  border-color: #bbb;*/
   color: #ffffff;
   background: #476ad1;
   text-decoration: none;
 }
+/* EDITING ENDS HERE */
+
 textarea,
 input {
   font: 1em normal Arial, Helvetica, sans-serif;
