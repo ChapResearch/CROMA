@@ -1,13 +1,16 @@
 <?php
 
 /*
-  Used to allow users to create/edit outreach
+  ---- outreach/outreachForm.php ----
+
+  used to allow users to create/edit outreach
 
   - Contents -
   outreachForm() - creates the form for outreach data (including times)
   deleteProfile() - used as a menu hook to "delete" (aka disable) the user
   changeCancel() - used as a menu hook to toggl whether the outreach event is cancelled
   duplicateOutreach() - used to make a copy of the outreach event
+  backToEvent() - used to allow a user to go back to the outreach page
 */   
 
 function addDateRow($form, &$form_state) {
@@ -24,6 +27,7 @@ function modifyDateRows_callback($form, $form_state) {
   return $form['fields']['dates'];
 }
 
+//   outreachForm() - creates the form for outreach data (including times)
 function outreachForm($form, &$form_state)
 {
   global $user;
@@ -36,7 +40,7 @@ function outreachForm($form, &$form_state)
 
 
   if(teamIsIneligible($TID)) {
-    drupal_set_message('Your team does not have permission to access this page!', 'error');
+    drupal_set_message('Your team does not have permission to access this page.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -45,17 +49,20 @@ function outreachForm($form, &$form_state)
     $new = $form_state['new'] = false;
     $outreach = dbGetOutreach($params["OID"]);
     $times = dbGetTimesForOutreach($params["OID"]);
-    $form_state['numRows'] = count($times); // set to display all times
-    $form_state['initialNumTimes'] = count($times); // record how many were there before (in case user deletes one)
+    // set to display all times
+    $form_state['numRows'] = count($times);
+    // record how many were there before (in case user deletes one)
+    $form_state['initialNumTimes'] = count($times); 
     $TID = $outreach['TID'];
     $form_state['TID'] = $TID;
   }
 
   $form = array();
 
+  // if the user is editing an old outreach
   if(!$new){
 
-  //Menu Hook begins
+  // menu hook to duplicate outreach
       $confirmBoxJS = "if(!confirm('Are you sure you want to duplicate this outreach? Any changes you made just now will NOT be saved.')){return false;}";
       
       
@@ -69,7 +76,7 @@ function outreachForm($form, &$form_state)
 
   if (!$new){
 
-  //Menu Hook
+  // menu hook to cancel the outreach
 
     if($outreach["cancelled"]){
 
@@ -95,11 +102,13 @@ function outreachForm($form, &$form_state)
 
   $teamNumb = dbGetTeamNumber($TID);
 
+  // form title
   $form['fields']=array(
 			'#type'=>'fieldset',
 			'#title'=>t('Add Outreach: Team ' . '<b>' . $teamNumb . '</b>'),
 			);
 
+  // if editing an outreach, then allow a user to cancel changes
   if(!$new){
     $form['fields']['back']=array(
 				  '#prefix'=>'<left>',
@@ -115,6 +124,7 @@ function outreachForm($form, &$form_state)
 
   $form['fields']['markupOne']=array('#markup'=>'<table>');
 
+  // displays the name of the outreach editing
   $form['fields']['name']=array(
 				'#prefix'=>'<tr><td colspan="3" style="text-align:center">',
 				'#type'=>'textfield',
@@ -127,6 +137,7 @@ function outreachForm($form, &$form_state)
 
   $tags = dbGetOutreachTagsForTeam($TID);
 
+  // notifies a user to create outreach tags if the team doesn't have any
   if(empty($tags)){
     if(hasPermissionForTeam('manageOutreachTags', $TID)){
       $msg = 'Click <a href="?q=teamOutreachSettings"><b>here</b></a> to change your settings.';
@@ -137,13 +148,15 @@ function outreachForm($form, &$form_state)
 
     $form['fields']['tags']=array(
 				  '#prefix'=>'<td colspan="3" style="text-align:center">',
-				  '#markup'=>'Tags:<br><em>You have no available tags!</em>',
+				  '#markup'=>'Tags:<br><em>You have no available tags.</em>',
 				  '#suffix'=>'</td></tr>'
 				  );
   } else {
 
+    // allows a user to add tags to the outreach
     if(!$new){
-      $oldTags = dbGetTagsForOutreach($form_state['OID'], true); // get only OTID's to satisfy select field
+      // get only OTID's to satisfy select field
+      $oldTags = dbGetTagsForOutreach($form_state['OID'], true); 
     }
 
     $form['fields']['tags']=array(
@@ -159,6 +172,7 @@ function outreachForm($form, &$form_state)
 				  );
   }
 
+  // allows a user to change the status of the outreach if they have permission 
   if(hasPermissionForTeam('manageOutreachTags', $TID)){
     $form['fields']['status']=array(
 				    '#prefix'=>'<tr><td colspan="3" style="text-align:center">',
@@ -169,6 +183,7 @@ function outreachForm($form, &$form_state)
 				    '#chosen'=>true,
 				    '#suffix'=>'</td>'
 				    );
+    // if the user doesn't have permission, then the status of isIdea displays idea
   } else if(!$new && $outreach['status'] == 'isIdea'){
     $form['fields']['status']=array(
 				    '#prefix'=>'<tr><td colspan="3" style="text-align:center">',
@@ -179,7 +194,7 @@ function outreachForm($form, &$form_state)
 				    '#disabled'=>true,
 				    '#suffix'=>'</td>'
 				    );
-
+    // if the user doesn't have permission, then the status of isOutreach displays outreach
   } else if(!$new && $outreach['status'] == 'isOutreach'){
     $form['fields']['status']=array(
 				    '#prefix'=>'<tr><td colspan="3" style="text-align:center">',
@@ -190,7 +205,7 @@ function outreachForm($form, &$form_state)
 				    '#disabled'=>true,
 				    '#suffix'=>'</td>'
 				    );
-	
+    // if the user doesn't have permission, then the status of doingWriteUp displays write-up
   } else if(!$new && $outreach['status'] == 'doingWriteUp'){
     $form['fields']['status']=array(
 				    '#prefix'=>'<tr><td colspan="3" style="text-align:center">',
@@ -201,7 +216,7 @@ function outreachForm($form, &$form_state)
 				    '#disabled'=>true,
 				    '#suffix'=>'</td>'
 				    );
-
+    // if the user doesn't have permission, then the status of locked displays locked
   } else if(!$new && $outreach['status'] == 'locked'){
     $form['fields']['status']=array(
 				    '#prefix'=>'<tr><td colspan="3" style="text-align:center">',
@@ -213,6 +228,7 @@ function outreachForm($form, &$form_state)
 				    '#suffix'=>'</td>'
 				    );
 	
+    // if the user doesn't have permission, then the events created can only have a status of idea
   } else {
 	  
     $form['fields']['status']=array(
@@ -226,19 +242,8 @@ function outreachForm($form, &$form_state)
 				    );
 	
   }
-  
-  /*  $form['fields']['status']=array(
-    '#prefix'=>'<tr><td colspan="3" style="text-align:center">',
-    '#type'=>'select',
-    '#default_value'=>$new?'Select':$outreach['status'],
-				  '#options'=> array('isIdea'=>'Idea', 'isOutreach'=>'Outreach', 'doingWriteUp'=>'Write-Up', 'locked'=>'Locked'),
-				  '#title'=>t('Status:'),
-				  '#default_value'=>$new?'':$outreach['status'],
-				  '#chosen'=>true,
-				  '#suffix'=>'</td>'
-				  );
-  */
 
+  // allows a user to go to team outreach settings
   $form['fields']['manageTagsBttn']=array(
 					  '#prefix'=>'<td colspan ="3" style="text-align:center">',
 					  '#markup'=>'<a href="?q=teamOutreachSettings" target="_blank"><button type="button">Manage Tags</button></a>',
@@ -267,6 +272,7 @@ function outreachForm($form, &$form_state)
 
   $team = dbGetTeam($TID);
 
+  // default value from the team form
   $form['fields']['city']=array(
 				'#prefix'=>'<td colspan="1" style="text-align:center">',
 				'#type'=>'textfield',
@@ -301,7 +307,7 @@ function outreachForm($form, &$form_state)
 					'#type'=>'textfield',
 					'#title'=>t("Host Contact's First Name:"),
 					'#default_value'=>$new?'':$outreach['co_firstName'],
-					'#placeholder'=>'First name of contact for this outreach',
+					'#placeholder'=>'Contact for this outreach',
 					'#suffix'=>'</td>'
 					);
 
@@ -310,7 +316,6 @@ function outreachForm($form, &$form_state)
 				       '#type'=>'textfield',
 				       '#title'=>t("Host Contact's Last Name:"),
 				       '#default_value'=>$new?'':$outreach['co_lastName'],
-				       '#placeholder'=>'Last name of contact for this outreach',
 				       '#suffix'=>'</tr>'
 				       );
 
@@ -329,7 +334,7 @@ function outreachForm($form, &$form_state)
 				    '#type'=>'textfield',
 				    '#title'=>t("Host Contact's Email:"),
 				    '#default_value'=>$new?'':$outreach['co_email'],
-				    '#placeholder'=>'Email of contact for this outreach',
+				    '#placeholder'=>'Email of outreach contact',
 				    '#suffix'=>'</td></tr>'
 				    );
 
@@ -339,46 +344,12 @@ function outreachForm($form, &$form_state)
 					   '#type'=>'textfield',
 					   '#title'=>t("Host Organization:"),
 					   '#default_value'=>$new?'':$outreach['co_organization'],
-					   '#placeholder'=>'Name of group participating with for this outreach',
+					   '#placeholder'=>'Group participating with for this outreach',
 					   '#suffix'=>'</td></tr>'
 					   ); 
 
 
-  //Moved to writeUp Form
-
-  /*  $form['fields']['totalAttendance']=array(
-					   '#prefix'=>'<td colspan="3" style="text-align:center">',
-					   '#type'=>'textfield',
-					   '#title'=>t('Total Event Attendance:'),
-					   '#default_value'=>$new?NULL:$outreach['totalAttendance'],
-					   '#placeholder'=>'Total people that attended the event (i.e. 2000)',
-					   '#states' => array(
-							      'invisible' => array(
-										   ':input[name="status"]' => array('value' => 'isIdea'),
-										   ),
-							      ),
-					   '#suffix'=>'</td></tr>'
-					   );
-  */
-
-  //Picture moved to editThumbnail
-
-  /*  $form['fields']['thumbnail']=array(
-				     '#markup'=>'<td colspan="3" style="text-align:center">'
-				     );
-  if ($new){
-    $oldFID = '';
-  } else {
-    $oldFID = $outreach['FID'];
-    $form_state['oldFID'] = $oldFID;
-  }
-
-  $form['fields']['FID'] = generatePictureField('Thumbnail Picture for Outreach', $oldFID);
-     
-  $form['fields']['footer'] = array('#markup'=>'</td></tr>');
-
-  */
-
+  // allows a user to add dates to an outreach
   if (empty($form_state['numRows'])) {
     $form_state['numRows'] = 1;
   }
@@ -490,28 +461,7 @@ function outreachForm($form, &$form_state)
     $form['fields']['dates']["divFooter-$i"]=array('#markup'=>'</table></div></td>');
 
 
-    //Moved to writeUp Form
-
-    /*
-
-  $form['fields']['testimonial']=array(
-				       '#prefix'=>'<tr><td colspan="6" style="text-align:center">',
-				       '#type'=>'textarea',
-				       '#title'=>t('Comments/Testimonials:'),
-				       '#default_value'=>$new?'':$outreach['testimonial'],
-				       '#placeholder'=>'Maximum of 500 characters',
-				       '#states' => array(
-							    'invisible' => array(
-										 ':input[name="status"]' => array('value' => 'isIdea'),
-										 ),
-							  ),
-				       '#suffix'=>'</td></tr>',
-				       '#maxlength_js'=>'TRUE',
-				       '#maxlength'=>'500'
-				       );
-
-    */
-
+    // allows the user to change the outreach visibility if the status is locked
   if (!$new && $outreach["status"] == "locked"){
 
       $isPublicOptions = array(0 => t('Private'), 1 => t('Public'));
@@ -527,8 +477,6 @@ function outreachForm($form, &$form_state)
 
     }
 
-  //  $form['fields']['html1']=array('#markup'=>'</td></tr><tr><td>');
-
   $form['fields']['submit']=array(
 			'#prefix'=>'<tr><td colspan="6" style="text-align:right">',
 			'#type' => 'submit',
@@ -541,12 +489,12 @@ function outreachForm($form, &$form_state)
   $form['fields']['finalFooter']=array('#markup'=>'</table>');
 
   if(!$new && !(hasPermissionForTeam('editAnyOutreach', $TID) || isMyOutreach($params['OID']))){
-    drupal_set_message("You don't have permission to edit this outreach!", 'error');
+    drupal_set_message("You don't have permission to edit this outreach.", 'error');
     drupal_goto('viewOutreach', array('query'=>array('OID'=>$params['OID'])));
   }
 
   if(dbGetTeamsForUser($user->uid) == NULL) {
-    drupal_set_message("You don't have a team assigned!", 'error');
+    drupal_set_message("You don't have a team assigned.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -556,12 +504,11 @@ function outreachForm($form, &$form_state)
   }
     
   if(dbGetStatusForTeam($TID) == "0" || dbGetStatusForTeam($TID) == FALSE){
-    drupal_set_message("This team isn't active/approved!", 'error');
+    drupal_set_message("This team isn't active/approved.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
     
   return $form;
-
 }
 
 function outreachForm_validate($form, $form_state)
@@ -570,23 +517,11 @@ function outreachForm_validate($form, $form_state)
     form_set_error('name','Name cannot be empty.');
   }
 
-  /*  if(!empty($form_state['values']['totalAttendance']) &&
-     !is_numeric($form_state['values']['totalAttendance'])){
-    form_set_error('totalAttendance','Total attendance must be a number.');
-    }*/
-
   if(!empty($form_state['values']['description'])) {
     if(strlen($form_state['values']['description'])>999){
       form_set_error('description',"The description must be fewer than 500 characters.");
     }
   }
-
-  /*
-  if(!empty($form_state['values']['testimonial'])) {
-    if(strlen($form_state['values']['testimonial'])>999){
-      form_set_error('testimonial',"The testimonial must be fewer than 500 characters.");
-    }
-    }*/
 
   if(!empty($form_state['values']['name'])) {
     if(strlen($form_state['values']['name'])>50){
@@ -598,7 +533,7 @@ function outreachForm_validate($form, $form_state)
     if(strlen($form_state['values']['co_phoneNumber'])>20){
       form_set_error('co_phoneNumber',"The phone number of your host must be fewer than 20 characters.");
     } else if(!is_numeric($form_state['values']['co_phoneNumber'])){
-      form_set_error('co_phoneNumber','Phone numbers must be numeric!'); // checks that phone number is all numbers
+      form_set_error('co_phoneNumber','Phone numbers must be numeric.'); // checks that phone number is all numbers
     }
   }
 
@@ -631,12 +566,6 @@ function outreachForm_validate($form, $form_state)
       form_set_error('city',"The city must be fewer than 30 characters.");
     }
   }
-
-  /*  if(!empty($form_state['values']['totalAttendance'])) {
-    if(strlen($form_state['values']['totalAttendance'])>11){
-      form_set_error('totalAttendance',"The total attendance must be fewer than 11 numbers long.");
-    }
-    }*/
 
   if(!empty($form_state['values']['peopleImpacted'])) {
     if(strlen($form_state['values']['peopleImpacted'])>11){
@@ -671,7 +600,6 @@ function outreachForm_submit($form, $form_state)
   $outreachData = getFields($outreachFields, $form_state['values']);
   $outreachData = stripTags($outreachData, ''); // remove all tags
   $outreachData['description'] = stripTags(array($form_state['values']['description'])); // allow some tags
-  //  $outreachData['testimonial'] = stripTags(array($form_state['values']['testimonial'])); 
   $outreachData["TID"] = $TID;
   if($form_state['new']){
     $outreachData["UID"] = $UID;
@@ -687,13 +615,6 @@ function outreachForm_submit($form, $form_state)
     }
   }
 
-  /*  if($outreachData['totalAttendance'] == ''){
-e    $outreachData['totalAttendance'] = NULL;
-    }*/
-
-  //  $oldFID = isset($form_state['oldFID'])?$form_state['oldFID']:0;
-  //  replacePicture($outreachData['FID'], $oldFID, 'Outreach'); // does its own checks
-
   if (!$form_state['new']){ // updating existing event
     $OID = $form_state['OID'];
     $result = dbUpdateOutreach($OID, $outreachData);
@@ -702,6 +623,7 @@ e    $outreachData['totalAttendance'] = NULL;
       for($i = 0; $i < $form_state['numRows']; $i++){ // loop through date rows
 	$TOID = isset($form_state['fields']['dates']["TOID-$i"])?$form_state['fields']['dates']["TOID-$i"]:0;
 	$timeData['startTime'] = dbDatePHP2SQL(strtotime($form_state['values']["startTime-$i"]));
+	dpm($timeData['startTime']);
 	$timeData['endTime'] = dbDatePHP2SQL(strtotime($form_state['values']["endTime-$i"]));
 	if ($timeData['startTime'] != null && $timeData['endTime'] != null){ // if row isn't empty
 	  if($TOID != 0){ // update existing record
@@ -752,7 +674,7 @@ e    $outreachData['totalAttendance'] = NULL;
 
       drupal_set_message("Outreach updated!");
     } else {
-      drupal_set_message("Outreach not updated!");
+      drupal_set_message("Outreach not updated.");
     }
   } else { // adding new event
     $outreachData['logDate'] = dbDatePHP2SQL(time());
@@ -804,12 +726,10 @@ e    $outreachData['totalAttendance'] = NULL;
   if(dbIsOutreachOver($OID)){
     drupal_set_message("It appears you are logging an old event. Don't forget to <a href=\"?q=logHours&OID=$OID\"><b>log old hours</b></a>!");
   }
-  /*  if (isset($params['url'])){
-    drupal_goto($params['url'], array('query'=>$params));
-    }*/
     drupal_goto('viewOutreach', array('query'=>array('OID'=>$OID)));
 }
 
+// used as a menu hook to toggl whether the outreach event is cancelled
 function changeCancel($OID)
 {
   $outreach = dbGetOutreach($OID);
@@ -819,7 +739,7 @@ function changeCancel($OID)
     drupal_set_message('Outreach uncancelled!');
   } else {
     dbCancelEvent($OID);
-    drupal_set_message('Outreach cancelled!');
+    drupal_set_message('Outreach cancelled.');
   }
 
   if(isset($_SERVER['HTTP_REFERER'])){
@@ -829,6 +749,7 @@ function changeCancel($OID)
   }
 }
 
+// duplicateOutreach() - used to make a copy of the outreach event
 function duplicateOutreach($OID)
 {
   $newOID = dbDuplicateOutreach($OID);
@@ -843,9 +764,10 @@ function duplicateOutreach($OID)
       }
     }
   }
-  drupal_set_message('There was an error...', 'error');
+  drupal_set_message('There was an error.', 'error');
 }
 
+// used to allow a user to go back to the outreach event page
 function backToEvent()
 {
   $params = drupal_get_query_parameters(); //getting the parameters

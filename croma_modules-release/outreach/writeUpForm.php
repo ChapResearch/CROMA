@@ -1,6 +1,8 @@
 <?php
 
 /*
+  ---- outreach/writeUpForm.php ----
+
   used to allow users to create/edit an outreach's write up
 
   - Contents -
@@ -9,7 +11,6 @@
   approve() - approves the write up and sets event to locked as well as sending out a notification
   reject() - rejects a write up that was in approval stage and also sends out a notifications
   backToEvent1() - takes you back to page you came from
-  
 */
 
 function writeUpForm($form, &$form_state){
@@ -22,25 +23,27 @@ function writeUpForm($form, &$form_state){
   $approved = $form_state['approved'] = false;  
   $editor = $form_state['editor'] = null;
 
-  if(isset($params["OID"])){
+  if (isset($params["OID"])){
     $form_state['OID'] = $params['OID'];
     $outreach = dbGetOutreach($params["OID"]);
     $new = $form_state['new'] = false;
   } else {
-    drupal_set_message('There is not outreach write up selected!', 'error');
-    // shouldn't this return?
-    //    return;
+    drupal_set_message('There is no outreach write up selected.', 'error');
+    return;
   }
-  
-  if(!empty($outreach['writeUpUID'])){
+
+  // load in the name of the editor of the write-up
+  if (!empty($outreach['writeUpUID'])){
     $editor = $form_state['editor'] = dbGetUserName($outreach['writeUpUID']);
   }
   
-  if(isset($params["approving"]) || $outreach['isWriteUpSubmitted']){
+  // if the write-up has been submitted, then the current user is in the process of approving the write-up
+  if (isset($params["approving"]) || $outreach['isWriteUpSubmitted']){
     $approving = $form_state['approving'] = true;  
   }
   
-  if(isset($params["approved"]) || $outreach['isWriteUpApproved']){
+  // if the write-up has already been approved, set variables appropriately
+  if (isset($params["approved"]) || $outreach['isWriteUpApproved']){
     $approved = $form_state['approved'] = true;  
   }
   
@@ -48,10 +51,10 @@ function writeUpForm($form, &$form_state){
   
   $form['fields']=array(
 			'#type'=>'fieldset',
-			'#title'=>t('Adding a Write-Up for Outreach Event: ' . '<b>' . $outreachName . '</b>'),
+			'#title'=>t('Add Write-Up: ' . '<b>' . $outreachName . '</b>'),
 			);
   
-  if(!$new){
+  if (!$new){
     $form['fields']['back']=array(
 				  '#prefix'=>'<left>',
 				  '#limit_validation_errors' => array(),
@@ -59,7 +62,7 @@ function writeUpForm($form, &$form_state){
 				  '#type' => 'submit',
 				  '#value' => '⇦ Cancel Changes',
 				  '#attributes' => array(
-							 'OnSubmit' =>'if(!confirm("Back?")){return false;}'),
+							 'OnSubmit' =>'if (!confirm("Back?")){return false;}'),
 				  '#suffix'=>'</left>'
 				  );
   }
@@ -108,7 +111,7 @@ function writeUpForm($form, &$form_state){
 				       '#maxlength_js'=>'TRUE',
 				       '#maxlength'=>'500'
 				       );
-  if(!$approved){
+  if (!$approved){
     $form['fields']['save']=array(
 				  '#prefix'=>'<tr><td colspan="6" style="text-align:right">',
 				  '#type' => 'submit',
@@ -118,7 +121,7 @@ function writeUpForm($form, &$form_state){
 				  );
   }
 
-  if($approving){
+  if ($approving){
     $form['fields']['reject']=array(
 				     '#prefix'=>'',
 				     '#type' => 'submit',
@@ -151,28 +154,30 @@ function writeUpForm($form, &$form_state){
   return $form;
 }
 
-function writeUpForm_validate($form, $form_state){
+function writeUpForm_validate($form, $form_state)
+{
+  // currently no validation to be done
 }
 
 function writeUpForm_submit($form, $form_state)
 {
   global $user;
-  $UID = $user->uid;
   $params = drupal_get_query_parameters();
   $TID = getCurrentTeam()['TID'];
   $OID = $params["OID"];
-  $outreachData = dbGetOutreach($OID);
+
   $writeUpFields = array("totalAttendance", "testimonial", "writeUp");
-  $writeUpUpdate = getFields($writeUpFields, $form_state['values']);
-  $writeUpUpdate = stripTags($writeUpUpdate, ''); // remove all tags
-  if(empty($writeUpUpdate["totalAttendance"])){
-    $writeUpUpdate["totalAttendance"] = null;
+  $writeUpData = getFields($writeUpFields, $form_state['values']);
+  $writeUpData = stripTags($writeUpData, ''); // remove all tags
+  if (empty($writeUpData["totalAttendance"])){
+    $writeUpData["totalAttendance"] = null;
   }
-  $writeUpUpdate['writeUpUID'] = $UID;
-  $writeUpUpdate['isWriteUpSubmitted'] = true;
+  $writeUpData['writeUpUID'] = $user->uid;
+  $writeUpData['isWriteUpSubmitted'] = true;
 
-  $result = dbUpdateOutreach($OID, $writeUpUpdate);
+  $result = dbUpdateOutreach($OID, $writeUpData);
 
+  // notify all other moderators for the team
   $notification = array();
   $userName = dbGetUserName($user->uid);
   $outName = dbGetOutreachName($OID);
@@ -188,22 +193,20 @@ function writeUpForm_submit($form, $form_state)
   drupal_goto('viewOutreach', array('query'=>array('OID'=>$OID)));
 }
 
-function save($form, $form_state){
-
-  global $user;
-  $UID = $user->uid;
+function save($form, $form_state)
+{
   $params = drupal_get_query_parameters();
   $TID = getCurrentTeam()['TID'];
   $OID = $params["OID"];
-  $outreachData = dbGetOutreach($OID);
+
   $writeUpFields = array("totalAttendance", "testimonial", "writeUp");
-  $writeUpUpdate = getFields($writeUpFields, $form_state['values']);
-  $writeUpUpdate = stripTags($writeUpUpdate, ''); // remove all tags
-  if(empty($writeUpUpdate["totalAttendance"])){
-    $writeUpUpdate["totalAttendance"] = null;
+  $writeUpData = getFields($writeUpFields, $form_state['values']);
+  $writeUpData = stripTags($writeUpData, ''); // remove all tags
+  if (empty($writeUpData["totalAttendance"])){
+    $writeUpData["totalAttendance"] = null;
   }
 
-  $result = dbUpdateOutreach($OID, $writeUpUpdate);
+  $result = dbUpdateOutreach($OID, $writeUpData);
   drupal_set_message("Write Up Saved!");
   drupal_goto('viewOutreach', array('query'=>array('OID'=>$OID)));
 }
@@ -215,28 +218,29 @@ function approve($form, $form_state){
   $params = drupal_get_query_parameters();
   $TID = getCurrentTeam()['TID'];
   $OID = $params["OID"];
-  $outreachData = dbGetOutreach($OID);
+
   $writeUpFields = array("totalAttendance", "testimonial", "writeUp");
-  $writeUpUpdate = getFields($writeUpFields, $form_state['values']);
-  $writeUpUpdate = stripTags($writeUpUpdate, ''); // remove all tags
-  $writeUpUpdate['isWriteUpApproved'] = true;
-  $writeUpUpdate['isWriteUpSubmitted'] = 0;
-  $writeUpUpdate['status'] = 'locked';
-  if(empty($writeUpUpdate["totalAttendance"])){
-    $writeUpUpdate["totalAttendance"] = null;
+  $writeUpData = getFields($writeUpFields, $form_state['values']);
+  $writeUpData = stripTags($writeUpData, ''); // remove all tags
+  $writeUpData['isWriteUpApproved'] = true;
+  $writeUpData['isWriteUpSubmitted'] = 0;
+  $writeUpData['status'] = 'locked';
+  if (empty($writeUpData["totalAttendance"])){
+    $writeUpData["totalAttendance"] = null;
   }
 
-  $result = dbUpdateOutreach($OID, $writeUpUpdate);
+  $result = dbUpdateOutreach($OID, $writeUpData);
 
   $notification = array(
 			'TID' => $TID,
-			'dateCreated' => date(DEFAULT_TIME_FORMAT, time()),
-			'dateTargeted' => date(DEFAULT_TIME_FORMAT, time()),
+			'dateCreated' => dbDatePHP2SQL(time()),
+			'dateTargeted' => dbDatePHP2SQL(time()),
 			'message' => dbGetUserName($UID).' has just approved '.dbGetOutreachName($OID).'!',
 			'bttnLink' => '?q=viewOutreach&OID='.$OID,
 			'bttnTitle' => 'View Outreach'
 			);
   
+  // notify the appropriate people
   $outreachOwnerUID = dbGetOutreachOwner($OID);
   if ($UID != $outreachOwnerUID){
     dbAddNotification($notification);
@@ -252,7 +256,6 @@ function approve($form, $form_state){
 function reject($form, $form_state)
 {
   global $user;
-  $UID = $user->uid;
   $params = drupal_get_query_parameters();
   $TID = getCurrentTeam()['TID'];
   $OID = $params["OID"];
@@ -272,13 +275,13 @@ function reject($form, $form_state)
   $notification['bttnTitle'] = 'Redo Write Up';
   $notification['bttnLink'] = '?q=viewOutreach&OID=' . $OID;
   $notification['TID'] = $TID;
-  notifyUser($notification, $outreachData['writeUpUID']);
+  $notification['UID'] = $outreachData['writeUpUID'];
 
-  drupal_set_message("Write Up Rejected!");
+  dbAddNotification($notification);
+
+  drupal_set_message("Write Up Rejected.");
   drupal_goto('viewOutreach', array('query'=>array('OID'=>$OID)));
 }
-
-
 
 function backToEvent1()
 {

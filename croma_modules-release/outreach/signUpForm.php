@@ -23,7 +23,7 @@ function signUp($form, &$form_state)
 
   // various checks for permissions
   if(dbGetTeamsForUser($user->uid) == false){
-    drupal_set_message("You don't have a team assigned!", 'error');
+    drupal_set_message("You don't have a team assigned.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -33,11 +33,11 @@ function signUp($form, &$form_state)
     $TID = dbGetTeamForOutreach($OID);
 
     if(!dbIsUserApprovedForTeam($UID, $TID)) {
-      drupal_set_message('You do not have the permission to contribute to this event!', 'error');
+      drupal_set_message('You do not have the permission to contribute to this event.', 'error');
       drupal_goto($_SERVER['HTTP_REFERER']);
     }
     if(dbIsOutreachOver($OID)){
-      drupal_set_message('You can not contribute to this event! It has already ended.', 'error');
+      drupal_set_message('You can not contribute to this event. It has already ended.', 'error');
       drupal_goto($_SERVER['HTTP_REFERER']);
     }
     
@@ -201,7 +201,7 @@ function signUp_submit($form, $form_state)
 	dbAssignUserToOutreach($UID, $OID, $add);
       }
     }
-    $msgToUser = "You're commitment has been updated for outreach event:";
+    $msgToUser = "Your commitment has been updated for outreach event:";
   }
 
   // sending a notification to the appropriate user(s)
@@ -231,7 +231,7 @@ function cancelCommit()
 
   // removing user's commitment from the outreach completely
   dbRemoveUserFromOutreach($UID,$OID);
-  drupal_set_message("You're commitment to outreach event: " . dbGetOutreachname($OID) . " has been removed!"); //letting them know and redirecting user to the previous page they were on
+  drupal_set_message("Your commitment to outreach event: " . dbGetOutreachname($OID) . " has been removed!"); //letting them know and redirecting user to the previous page they were on
   drupal_goto($_SERVER['HTTP_REFERER']);
 }
 
