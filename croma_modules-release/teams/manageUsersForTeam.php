@@ -1,10 +1,23 @@
 <?php
 
+/*
+  ---- teams/manageUsersForTeam.php ----
+
+  used to add/remove users, as well as change their roles on the team
+
+  - Contents -
+  viewUsersAwaitingApproval() - shows all the current users trying to join a team
+  transferTeamOwnershipForm() - allows the team owner to choose a different team owner
+  kickUserFromTeam() - removes a user from the team
+  approveUser() - adds a pending user to the team
+  rejectUser() - deletes a user's application to the team, effectively denying them
+*/
+
 function viewUsersAwaitingApproval()
 {
   global $user;
   $params = drupal_get_query_parameters();
-  if(isset($params['TID'])){
+  if (isset($params['TID'])){
     $TID = $params['TID'];
     $teamNumber = dbGetTeamNumber($TID);
   } else {
@@ -13,10 +26,9 @@ function viewUsersAwaitingApproval()
     $teamNumber = $team['number'];
   }
   
-  if(teamIsIneligible($TID)) {
-    drupal_set_message('Your team does not have permission to access this page!', 'error');
+  if (teamIsIneligible($TID)) {
+    drupal_set_message('Your team does not have permission to access this page.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
-    return;
   }
 
   $markup = '<table><tr><td colspan="3">';
@@ -29,9 +41,9 @@ function viewUsersAwaitingApproval()
   $markup .= '<table class="infoTable"><th>Name</th><th>Email</th><th>Message</th><th></th></tr>';
   $users = dbGetUsersAwaitingApproval($TID);
 
-  if(!empty($users)){
-
-    foreach($users as $person) {
+  if (!empty($users)){
+    // loop through users, displaying approve and reject buttons for each
+    foreach ($users as $person) {
       $markup .= "<tr><td>{$person['firstName']} {$person['lastName']}</td>";
       $markup .= '<td>' . $person['userEmail'] . '</td>';
       $markup .= '<td>' . $person['userMessage'] . '</td>';
@@ -41,8 +53,7 @@ function viewUsersAwaitingApproval()
       $markup .= '<button>Reject</button></a></td></tr>';
     }
 
-  }else{
-
+  } else {
     $markup .= "<tr>";
     $markup .= '<td style="text-align:center" colspan="10"><em>[None]</em></td>';
     $markup .= "</tr>";
@@ -60,13 +71,13 @@ function transferTeamOwnershipForm($form, &$form_state)
   if(isset($params['TID'])){
     $form_state['TID'] = $TID = $params['TID'];
   } else {
-    drupal_set_message('You need to choose a team!', 'error');
+    drupal_set_message('You need to choose a team.', 'error');
     drupal_goto('showUsersForTeam');
   }
 
   $team = dbGetTeam($TID);
 
-  if($user->uid != $team['UID']){ // if the user is not the team owner
+  if ($user->uid != $team['UID']){ // if the user is not the team owner
     drupal_set_message("You are not the owner of team {$team['name']}", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }    
@@ -75,7 +86,7 @@ function transferTeamOwnershipForm($form, &$form_state)
 
   unset($people[$user->uid]); // shouldn't be able to transfer to self
 
-  $people[0] = ''; // needs a default value
+  $people[0] = ''; // field needs a default value
 
   $form['header']=array(
 			'#markup'=>"<h1>Transfer Ownership of {$team['name']}</h1>"
@@ -119,20 +130,22 @@ function transferTeamOwnershipForm($form, &$form_state)
 function transferTeamOwnershipForm_validate($form, $form_state)
 {
   if($form_state['values']['newOwner'] == 0){
-    form_set_error('newOwner', 'You must choose a new owner!');
+    form_set_error('newOwner', 'You must choose a new owner.');
   }
 }
 
 function transferTeamOwnershipForm_submit($form, $form_state)
 {
   global $user;
-
+  
+  // update the team and the new owner's role
   $newOwnerUID = $form_state['values']['newOwner'];
   $TID = $form_state['TID'];
   dbUpdateTeam($TID, array('UID'=>$newOwnerUID));
   dbUpdateUserRole($newOwnerUID, $TID, dbGetRID('teamOwner'));
   dbUpdateUserRole($user->uid, $TID, dbGetRID('teamAdmin'));
 
+  // set a message to notify the old owner on-screen
   $newOwnerName = dbGetUserName($newOwnerUID);
   $teamName = dbGetTeamName($TID);
   drupal_set_message("$newOwnerName is now the owner of $teamName!");
@@ -150,22 +163,21 @@ function transferTeamOwnershipForm_submit($form, $form_state)
   drupal_mail('teams', 'becameOwner', dbGetUserPrimaryEmail($newOwnerUID), variable_get('language_default'), $params = array('teamName'=>$teamName, 'newOwnerName'=>$newOwnerName, 'oldOwnerName'=>$oldOwnerName, 'oldOwnerEmail'=>$oldOwnerEmail, 'TID'=>$TID), $from = NULL, $send = TRUE);
 
   drupal_goto('showUsersForTeam', array('query'=>array('TID'=>$TID)));
-
 }
-  
 
+// menu hook callback to remove a user with the given UID from the team with the given TID
 function kickUserFromTeam($UID, $TID)
 {
   global $user;
   if(teamIsIneligible($TID)) {
-    drupal_set_message('Your team does not have permission to access this page!', 'error');
+    drupal_set_message('Your team does not have permission to access this page.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
-    return;
   }
 
   dbKickUserFromTeam($UID, $TID);
   dbRemoveAllUserRoles($UID, $TID);
-
+  
+  // notify the person who has been removed (and allow them to email the one who removed them)
   $notification = array('UID'=>$UID, 'TID'=>$TID, 'dateTargeted'=>dbDatePHP2SQL(time()), 'dateCreated'=>dbDatePHP2SQL(time()));
   $notification['message'] = 'You have been removed from ' . dbGetTeamName($TID);
   $notification['bttnTitle'] = 'Email Admin';
@@ -181,22 +193,24 @@ function kickUserFromTeam($UID, $TID)
   }
 }
 
+// menu hook callback to approve the user with the given UID for the team with the given TID
 function approveUser($UID, $TID)
 {
   if(teamIsIneligible($TID)) {
-    drupal_set_message('Your team does not have permission to access this page!', 'error');
+    drupal_set_message('Your team does not have permission to access this page.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
-    return;
   }
 
   dbApproveUser($UID, $TID);
 
+  // notify the newly approved user through CROMA
   $notification = array('UID'=>$UID, 'TID'=>$TID, 'dateCreated'=>dbDatePHP2SQL(time()),'dateTargeted'=>dbDatePHP2SQL(time()));
   $notification['message'] = 'You have just been approved for ' . dbGetTeamName($TID) . '!';
   $notification['bttnTitle'] = 'View Team';
   $notification['bttnLink'] = "?q=viewTeam&TID=$TID";
   dbAddNotification($notification);
 
+  // notify the newly approved user via email
   drupal_mail('teams', 'approvedForTeam', dbGetUserPrimaryEmail($UID), variable_get('language_default'), $params = array('teamName' => dbGetTeamName($TID), 'fullName' => dbGetUserName($UID)), $from = NULL, $send = TRUE);
 
   drupal_set_message("User has been added to your team.");
@@ -208,14 +222,15 @@ function approveUser($UID, $TID)
   }
 }
 
+// menu hook callback to reject a user
 function rejectUser($UID, $TID)
 {
-  if(teamIsIneligible($TID)) {
-    drupal_set_message('Your team does not have permission to access this page!', 'error');
+  if (teamIsIneligible($TID)) {
+    drupal_set_message('Your team does not have permission to access this page.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
-    return;
   }
-
+  
+  // currently delete the user's application to the team
   dbRejectUser($UID, $TID);
 
   $notification = array('UID'=>$UID, 'TID'=>$TID, 'dateCreated'=>dbDatePHP2SQL(time()),'dateTargeted'=>dbDatePHP2SQL(time()));

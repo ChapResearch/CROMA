@@ -1,5 +1,13 @@
+
+/*
+  ---- widgets/fancyScrollingStats.js ----
+
+  used to animate the numbers in the 'fancy stats' widget
+*/
+
 (function ($) {
 
+    // quick function to pull info from the url
     function getURLParameter(sParam)
     {
 	var sPageURL = window.location.search.substring(1);
@@ -15,12 +23,16 @@
     }
 
     $(document).ready(function(){
+	// get and parse the stats for the team number
 	var teamNumber = getURLParameter('teamNumber');
 	var data;
 	var url = 'http://croma.chapresearch.com:' + window.location.port + '/fancyScrollingStats.php';
 	var x = $.post(url, {teamNumber:teamNumber}, function(retVal){
 	    data = jQuery.parseJSON(retVal);
 	});
+
+	// once that data has been received, animate the numbers
+	// note that this function fills in specific HTML elements in fancyScrollingStats.html
 	$.when(x).then(function(){
 	    $({countNum: 0}).animate({countNum: data.numHours}, {
 		duration: 1500,

@@ -39,9 +39,9 @@ function dismissAllNotifications()
     foreach($_SESSION['notificationNIDsShown'] as $NID){ // used to ensure no undisplayed notifications are deleted
       dbDeleteNotification($NID);
     }
-    drupal_set_message('All notifications have been dismissed.');
+    drupal_set_message('All notifications have been dismissed!');
   } else {
-    drupal_set_message('No notifications to dismiss!');
+    drupal_set_message('No notifications to dismiss.');
   }
 
   if(isset($_SERVER['HTTP_REFERER'])){
@@ -74,7 +74,7 @@ function viewNotifications()
 
   // if there are no notifications for a user
   if(empty($notifications)){
-    $markup .= '<center><h4>No New Notifications! &#9786</h4></center>';
+    $markup .= '<center><h4>No New Notifications!</h4></center>';
     $_SESSION['notificationNIDsShown'] = array();
   } else {    // if there are notifications for a user
     $markup .= '<table>';
@@ -149,7 +149,7 @@ function viewAllNotifications()
 
   // if user has no notifications
   if(empty($notifications)){
-    $markup .= '<table class="infoTable"><th></th><tr><td style="text-align:center" colspan="10"><em>No New Notifications! &#9786</em></td></tr></table>';
+    $markup .= '<table class="infoTable"><th></th><tr><td style="text-align:center" colspan="10"><em>No New Notifications!</em></td></tr></table>';
     $_SESSION['notificationNIDsShown'] = array();
   } else {    // if user has notifications
     $markup .= '<table class="infoTable"><tr><th>Associated Picture</th><th>Notification Content</th><th></th></tr>';

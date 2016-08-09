@@ -23,12 +23,12 @@ include_once(MODULES_FOLDER.'/pictures/pictureFunctions.php');
 function uploadMedia($form, &$form_state) {
   $form = array();
 
-  $form['fields']['markupOne']=array('#markup'=>'<table><tr><h1>Upload Media</h1></tr></table>');
+  $form['fields']['markupOne']=array('#markup'=>'<table><tr><h1>Upload Media</h1></tr><th>Hold [Ctrl] in file selection window to upload multiple files.</th></table>');
 
   $form['pictures'] = array(
 			    '#type' => 'file',
 			    '#name' => 'files[]',
-			    '#title' => t('Hold [Ctrl] in file selection window to upload multiple files'),
+			    //			    '#title' => t('Hold [Ctrl] in file selection window to upload multiple files'),
 			    '#description' => t('JPG\'s, GIF\'s, and PNG\'s only, 10MB Max Size'),
 			    '#attributes' => array('multiple' => 'multiple'),
 			    );
@@ -84,7 +84,7 @@ function mediaForm($form, &$form_state) {
   else if(isset($form_state['MID'])){
     $MID = $form_state['MID'];
   } else {
-    drupal_set_message('No media selected!', 'error');
+    drupal_set_message('No media selected.', 'error');
     return;
   }
 
@@ -119,7 +119,7 @@ function mediaForm($form, &$form_state) {
   $form['fields']['picture']=array(
 				   '#prefix'=>'<td>',
 				   '#type'=>'item',
-				   '#markup'=> '<img src="' . generateURL($media['FID']) . '" style="width:125px; height:125px;">',
+				   '#markup'=> '<img src="' . generateURL($media['FID']) . '" style="max-width:200px; width:auto;  height:auto;">',
 				   '#suffix'=>'</td></tr>'
 				   );
 
@@ -168,7 +168,7 @@ function mediaForm($form, &$form_state) {
   $form_state['outreachList']= $outreachList;
 
   if(empty($outreachList)){
-    drupal_set_message("You don't have any outreaches to assign this to!", 'error');
+    drupal_set_message("You don't have any outreaches to assign this to.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
     return;
   }

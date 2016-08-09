@@ -19,13 +19,13 @@ function publicOutreach($form, &$form_state)
 
   // checking to make sure user has permission to change team outreach settings
   if(!(hasPermissionForTeam('editAnyOutreach', $TID))){
-    drupal_set_message("You don't have permission to change outreach settings for this team!", 'error');
+    drupal_set_message("You don't have permission to change outreach settings for this team.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
   // checking to see if the user has a team assigned
   if(dbGetTeamsForUser($user->uid) == false){
-    drupal_set_message("You don't have a team assigned!", 'error');
+    drupal_set_message("You don't have a team assigned.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -37,7 +37,7 @@ function publicOutreach($form, &$form_state)
 
   // checking to see if the team is active
   if(dbGetStatusForTeam($TID) == "0" || dbGetStatusForTeam($TID) == false){
-    drupal_set_message("This team isn't active/approved!", 'error');
+    drupal_set_message("This team isn't active/approved.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -101,7 +101,7 @@ function publicOutreach($form, &$form_state)
     // if the team does not have any locked outreaches
     $form['fields']['outreaches']=array(
 					'#prefix'=>'<table><tr><td colspan="3" style="text-align:left">',
-					'#markup'=>"Your team doesn't have any locked outreaches!<br>",
+					'#markup'=>"Your team doesn't have any locked outreaches. All locked outreaches are displayed on this page. If you make a locked outreach public, it becomes visible on the outreach directory widget.<br>",
 					'#suffix'=>'</td></tr></table>'
 					);
   }

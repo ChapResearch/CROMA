@@ -1,5 +1,14 @@
 <?php
 
+/*
+  ---- teams/applyForTeams.php ----
+
+  used to delete a team (and display the appropriate warnings)
+
+  - Contents -
+  deleteTeamPage() - paints the page explaining the consequences of deleting a team
+*/
+
 function deleteTeamPage($form, &$form_state)
 {
   global $user;
@@ -8,12 +17,13 @@ function deleteTeamPage($form, &$form_state)
   if(isset($params['TID'])){
     $TID = $form_state['TID'] = $params['TID'];
   } else {
-    drupal_set_message('You must specify a team!', 'error');
+    drupal_set_message('You must specify a team.', 'error');
     return;
   }
 
+  // check permissions
   if(!dbUserHasPermissionForTeam($user->uid, 'deleteTeam', $TID)) {
-    drupal_set_message('You do not have permission to delete this team!', 'error');
+    drupal_set_message('You do not have permission to delete this team.', 'error');
     return;
   }
 
@@ -65,10 +75,11 @@ function deleteTeamPage_submit($form, $form_state)
     dbKickAllUsersFromTeam($TID);
     dbRemoveAllRolesFromTeam($TID);
   } else {
-    drupal_set_message('You do not have permission to perform this action!', 'error');
+    drupal_set_message('You do not have permission to perform this action.', 'error');
     return;
   }
 
+  // send an email to the CROMA team detailing the team deletion
   $params['feedback'] = stripTags($form_state['values']['misc'], '');
   $params['userName'] = dbGetUserName($UID);
   $params['teamName'] = dbGetTeamName($TID);
@@ -76,7 +87,7 @@ function deleteTeamPage_submit($form, $form_state)
 
   drupal_mail('teams', 'teamDeleted', 'croma@chapresearch.com', variable_get('language_default'), $params, $from = NULL, $send = TRUE);
 
-  drupal_set_message(dbGetTeamName($TID) . " has been deleted!");
+  drupal_set_message(dbGetTeamName($TID) . " has been deleted.");
 
   drupal_goto('<front>');
 }

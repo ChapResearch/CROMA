@@ -51,19 +51,19 @@ function oldHoursForm($form, &$form_state)
   // checking that user is on a team
   if(dbGetTeamsForUser($user->uid) == false)
     {
-      drupal_set_message("You don't have a team assigned!", 'error');
+      drupal_set_message("You don't have a team assigned.", 'error');
       drupal_goto($_SERVER['HTTP_REFERER']);
     }
 
   // checking that you are accessing this page with a team in mind
   if (!isset($TID)){ // if $TID is still null
-    drupal_set_message("No team selected!", 'error');
+    drupal_set_message("No team selected.", 'error');
     return;
   }
 
   // checking to make sure you have permission to actually edit the offset hours
   if (!(isMyTeam($TID)) || !(hasPermissionForTeam('editTeam', $TID))){
-    drupal_set_message("You don't have permission to edit the 'old hours' for this team!", 'error');
+    drupal_set_message("You don't have permission to edit the 'old hours' for this team.", 'error');
     return;
   }
 
@@ -71,7 +71,7 @@ function oldHoursForm($form, &$form_state)
   $form['fields']=array(
 			'#prefix'=>'<div id="oldHourRows-div">',
 			'#type'=>'fieldset',
-			'#title'=>t('Offsetting Hours For Team: ' . dbGetTeamName($TID)),
+			'#title'=>t('Enter Old Hours For Team: ' . dbGetTeamName($TID)),
 			'#suffix'=>'</div>',
 			);
 
@@ -266,7 +266,7 @@ function oldHoursForm_submit($form, $form_state)
   } else if ($added){
     drupal_set_message("Your hours have been logged!");
   } else if ($removed){
-    drupal_set_message("Your hours have been removed!");
+    drupal_set_message("Your hours have been removed.");
   }
 
   drupal_goto('viewTeam', array('query'=>array('TID'=>$TID)));

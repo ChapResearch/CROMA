@@ -6,10 +6,11 @@ include_once("dbFunctions.php");
     file contains all CROMA-specific database functions. It relies on the file dbFunctions.php
    for low-level access to the mySQL database (and its ability to operate outside of Drupal). The
    file is roughly organized into sections based on which table the function is associated with.
-*\/
+*\
 
 /* -------------------------------------- OUTREACH ---------------------------------------------- */
 
+// note that this function is currently not used
 function dbExportTeamOutreach($TID)
 {
   $sql = 'SELECT outreach.* ';
@@ -31,7 +32,7 @@ function dbIsOutreachCancelled($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if(!empty($result)) {
+  if (!empty($result)) {
     return true;
   }
   return false;
@@ -78,7 +79,7 @@ function dbGetUIDsForOutreach($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     $retArr = array();
     foreach($result as $row){
       if ($row['UID'] != null){
@@ -106,42 +107,10 @@ function dbGetCancelledOutreach($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result;
   }
   return false;
-}
-
-/* dbGetOutreachForTeam() - gets all the outreach for a team
- */
-function dbGetOutreachForTeam($TID)
-{
-  $sql = "SELECT * FROM outreach ";
-  $sql .= "WHERE TID = :TID;";
-  $proxyFields = array(":TID" => $TID);
-  $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
-
-  if($result) {
-    return $result;
-  }
-  return false;
-}
-
-
-// TODO - finish this
-function dbGetOutreachByDate($TID)
-{
-  $sql = "SELECT * FROM outreach ";
-  $sql .= "INNER JOIN timesVsOutreach WHERE timesVsOutreach.OID = outreach.OID ";
-  $sql .= "WHERE TID = :TID ORDER BY MIN";
-  $proxyFields = array(":TID" => $TID);
-  $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
-
-  if($result) {
-    return $result;
-  }
-  return false;
-
 }
 
 /* dbGetOutreachListForTeam() - generates a list of OID's pointing to names (in order to populate a dropdown
@@ -153,7 +122,7 @@ function dbGetOutreachListForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     $retArr = array();
     foreach($result as $row){
       $retArr[$row['OID']] = $row['name'];
@@ -172,7 +141,7 @@ function dbGetOutreachTagsForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     $retArr = array();
     foreach($result as $row){
       $retArr[$row['OTID']] = $row['tagName'];
@@ -191,7 +160,7 @@ function dbGetTagName($OTID)
   $proxyFields = array(":OTID" => $OTID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['tagName'];
   }
   return false;
@@ -234,7 +203,7 @@ function dbRemoveTagFromOutreach($OTID, $OID)
 function dbGetOutreachMatchingTags($tags, $TID, $count = true)
 {
   $sql = 'SELECT ';
-  if($count){
+  if ($count){
     $sql .= 'COUNT(*)';
   } else {
     $sql .= 'outreach.OID, name';
@@ -253,7 +222,7 @@ function dbGetOutreachMatchingTags($tags, $TID, $count = true)
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);  
 
   if ($result){
-    if($count){
+    if ($count){
       return isset($result[0]['COUNT(*)'])?$result[0]['COUNT(*)']:0;
     }
     return $result;
@@ -276,7 +245,7 @@ function dbGetTagsForOutreach($OID, $OTID_only = false)
   if ($result){
     $retArr = array();
     foreach($result as $row){
-      if(!$OTID_only){
+      if (!$OTID_only){
       $retArr[$row['OTID']] = $row['tagName'];
       } else {
 	$retArr[] = $row['OTID'];
@@ -295,7 +264,7 @@ function dbGetLockedOutreachForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result;
   }
   return false;
@@ -310,7 +279,7 @@ function dbGetIdeasForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result;
   }
   return false;
@@ -318,14 +287,19 @@ function dbGetIdeasForTeam($TID)
 
 /* dbGetWriteUpsForTeam() - gets the write ups for a team
  */
-function dbGetWriteUpsForTeam($TID)
+function dbGetWriteUpsForTeam($TID, $submitted = null)
 {
   $sql = "SELECT * FROM outreach ";
-  $sql .= "WHERE TID = :TID and status='doingWriteUp';";
-  $proxyFields = array(":TID" => $TID);
+  $sql .= "WHERE TID = :TID and status='doingWriteUp' ";
+  if (isset($submitted)){
+    $sql .= 'AND outreach.isWriteUpSubmitted = :isWriteUpSubmitted';
+    $proxyFields[':isWriteUpSubmitted']=$submitted;
+  }
+
+  $proxyFields[":TID"] = $TID;
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result;
   }
   return false;
@@ -340,7 +314,7 @@ function dbGetPrivateOutreachForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result;
   }
   return false;
@@ -355,7 +329,7 @@ function dbGetPublicOutreachForTeam($TID)
   $proxyfields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result;
   }
   return false;
@@ -370,7 +344,7 @@ function dbGetUserSignUpUOID($UID, $OID)
   $sql .= "AND OID = :OID ";
   $proxyFields = array(":UID" => $UID, ":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
-  if($result){
+  if ($result){
     $UOID = $result["0"]["UOID"];
   }
   return isset($UOID)?$UOID:false;
@@ -391,32 +365,16 @@ function dbIsUserSignedUp($UID, $OID)
   return !empty($result);
 }
 
-// TODO - does this create duplicates?
-function dbGetUsersForOutreach($OID)
-{
-  $sql = "SELECT * FROM usersVsOutreach ";
-  $sql .= "WHERE OID = :OID";
-  $proxyFields = array(":OID" => $OID);
-  $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
-
-  if($result) {
-    return $result;
-  }
-  return false;
-}
-
 /* dbRemoveUserFromOutreach() - removes a user's association from an outreach
  */
-
 function dbRemoveUserFromOutreach($UID, $OID){
-$sql = "DELETE FROM usersVsOutreach ";
-$sql .= "WHERE UID = :UID AND OID = :OID;";
+  $sql = "DELETE FROM usersVsOutreach ";
+  $sql .= "WHERE UID = :UID AND OID = :OID;";
 
-$proxyFields = array(":UID" => $UID, ":OID" => $OID);
-$result = db_query($sql, $proxyFields);
+  $proxyFields = array(":UID" => $UID, ":OID" => $OID);
+  $result = db_query($sql, $proxyFields);
 
-return ($result != false);
-
+  return ($result != false);
 }
 
 function dbApproveIdea($OID)
@@ -427,11 +385,6 @@ function dbApproveIdea($OID)
 function dbRejectIdea($OID)
 {
   return dbRemoveEntry("outreach","OID",$OID);
-}
-
-function dbEditLocked($OID)
-{
-  return dbUpdate("outreach", array("status"=>'Locked'),"OID",$OID);
 }
 
 /* dbCreateOutreach() - adds the given outreach to the "outreach" table and returns the OID of the new outreach.
@@ -447,8 +400,8 @@ function dbCreateOutreach($row)
   }
 }
 
-/* dbDuplicateOutreach() - duplicates the given outreach event (and increments the name)*/
- 
+/* dbDuplicateOutreach() - duplicates the given outreach event (and increments the name)
+*/
 function dbDuplicateOutreach($OID)
 {
   $row = dbGetOutreach($OID);
@@ -474,7 +427,7 @@ function dbDuplicateOutreachTimes($oldOID, $newOID)
   foreach($times as &$time){
     unset($time['TOID']);
     $time['OID'] = $newOID;
-    if(!dbGenericInsert($time, 'timesVsOutreach')){
+    if (!dbGenericInsert($time, 'timesVsOutreach')){
       $worked = false;
     }
   }
@@ -497,12 +450,11 @@ function dbGetPplSignedUpForEvent($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
-    return $result[0];
+  if ($result) {
+    return $result;
   }
 
-  return -1;
-
+  return false;
 }
 
 /* dbGetNumPplSignedUpForEvent() - calculates the number of people signed up for an event
@@ -513,22 +465,21 @@ function dbGetNumPplSignedUpForEvent($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['COUNT(DISTINCT UID)'];
   }
 
-  return -1;
-
+  return false;
 }
 
-/* dbGetOutreachIdeas()-  user can get outreach ideas, returns all outreach events that are not approved
+/* dbGetOutreachIdeas() -  returns all outreach events that are still ideas
  */
 function dbGetOutreachIdeas($UID, $limit = null)
 { 
   return dbSelect("outreach",array("status"=>"isIdea","UID"=>$UID), array('logDate'=>'DESC'), $limit);
 }
 
-/* dbGetOutreachWriteUp()-  user can get outreaches with status of write up
+/* dbGetOutreachWriteUp() - returns all outreaches in the "write-up" phase
  */
 function dbGetOutreachWriteUp($TID, $limit = null)
 { 
@@ -540,7 +491,7 @@ function dbGetOutreachWriteUp($TID, $limit = null)
 function dbGetOutreach($OID)
 { 
   $array = dbSimpleSelect("outreach","OID",$OID);
-  if(!empty($array)){
+  if (!empty($array)){
     return $array[0]; // deal with nested arrays
   }
   return false;
@@ -564,7 +515,7 @@ function dbGetHoursForOutreach($OID)
 {
   $rows = dbSimpleSelect("hourCounting", "OID", $OID, 'isApproved', true);
   $total = 0;
-  foreach($rows as $row){
+  foreach ($rows as $row){
     $total += $row["numberOfHours"];
   }
 
@@ -575,7 +526,7 @@ function dbGetTotalHours()
 {
   $rows = dbSimpleSelect("hourCounting", 'isApproved', true);
   $total = 0;
-  foreach($rows as $row){
+  foreach ($rows as $row){
     $total += $row["numberOfHours"];
   }
 
@@ -583,7 +534,7 @@ function dbGetTotalHours()
 }
 
 
-/* dbApproveEvent() - approve event  with the given OID 
+/* dbApproveEvent() - approve event with the given OID 
  */
 function dbApproveEvent($OID)
 {
@@ -616,10 +567,10 @@ function dbGetOutreachOwner($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['UID'];
   }
-  return -1;
+  return false;
 }
 
 /* dbGetOutreachName() - return the name of the outreach
@@ -631,7 +582,7 @@ function dbGetOutreachName($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['name'];
   }
   return false;
@@ -658,7 +609,7 @@ function dbIsOutreachOver($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result[0]['MAX(endTime)'] != null) {
+  if ($result[0]['MAX(endTime)'] != null) {
     return (dbDateSQL2PHP($result[0]['MAX(endTime)']) < time());
   }
   return false;
@@ -673,7 +624,7 @@ function dbGetTimesForOutreach($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result;
   }
   return false;
@@ -689,7 +640,7 @@ function dbGetEarliestTimeForOutreach($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['MIN(startTime)'];
   }
   return false;
@@ -705,15 +656,12 @@ function dbGetEarliestTimeForFutureOutreach($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['MIN(startTime)'];
   }
   return false;
 }
 
-/*
-
- */
 function dbGetOutreachesForUserForTeam($UID, $TID)
 {
   $proxyFields = array(":UID"=>$UID , ":TID"=>$TID);
@@ -775,7 +723,7 @@ function dbGetOwnerForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['UID'];
   }
   return false;
@@ -790,7 +738,7 @@ function dbGetTeamForOutreach($OID)
   $proxyFields = array(":OID" => $OID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['TID'];
   }
   return false;
@@ -805,10 +753,10 @@ function dbGetTeamLogo($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['FID'];
   }
-  return -1;
+  return false;
 }
 
 /* dbGetTeamName() - return the name of the team
@@ -820,7 +768,7 @@ function dbGetTeamName($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['name'];
   }
   return false;
@@ -835,7 +783,7 @@ function dbGetTeamOwner($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['UID'];
   }
   return false;
@@ -848,7 +796,7 @@ function dbGetTeamNumber($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['number'];
   }
   return false;
@@ -875,7 +823,6 @@ function dbCreateTeam($row)
   $row['isActive'] = true;
   return dbGenericInsert($row,"teams");
 }
-
 
 /* dbDeactivateTeam() - deactivates the team given by $TID
  */
@@ -942,22 +889,10 @@ function dbIsUserApprovedForTeam($UID, $TID)
   $proxyFields = array(":UID" => $UID, ":TID" => $TID);
   $result = db_query($sql, $proxyFields);
   $rows = $result->fetchAll(PDO::FETCH_ASSOC);
-  if(!empty($rows)){
+  if (!empty($rows)){
     return $rows[0]['isApproved'];
   }
   return false;
-}
-
-/* You'll notice that this function returns the $rows because we don't want the [0]['isApproved'] */
-
-function dbIsUserApprovedForOutreach($UID, $TID)
-{
-  $sql = 'SELECT * FROM usersVsTeams ';
-  $sql .= 'WHERE UID = :UID AND TID = :TID;';
-  $proxyFields = array(":UID" => $UID, ":TID" => $TID);
-  $result = db_query($sql, $proxyFields);
-  $rows = $result->fetchAll(PDO::FETCH_ASSOC);
-  return $rows;
 }
 
 /* dbKickUserFromTeam() - removes the user given by $UID from the team given by $TID
@@ -983,11 +918,11 @@ function dbGetNumStudentsForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]["COUNT(*)"];
   }
 
-  return -1;
+  return false;
 }
 
 /* dbGetNumMentorsForTeam() - returns the number of people on a given team.
@@ -1000,7 +935,7 @@ function dbGetNumMentorsForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]["COUNT(*)"];
   }
 
@@ -1016,7 +951,7 @@ function dbGetNumOutreachForTeam($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]["COUNT(*)"];
   }
 
@@ -1030,7 +965,7 @@ function dbGetNumTotalOutreach()
   $sql = "SELECT COUNT(*), outreach.* FROM outreach ";
   $result = db_query($sql, array())->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]["COUNT(*)"];
   }
 
@@ -1048,7 +983,7 @@ function dbGetNumOutreachForUser($UID)
   $proxyFields = array(":UID" => $UID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]["COUNT(*)"];
   }
 
@@ -1085,12 +1020,12 @@ function dbGetTeamsAppliedFor($UID)
  */
 function dbApplyForTeam($application)
 {
-  if(in_array($application['TID'], dbGetTeamsForUser($application['UID']))){
+  if (in_array($application['TID'], dbGetTeamsForUser($application['UID']))){
     printErrorMsg('You are already on this team!');
     return false;
   }
   
-  if(in_array($application['TID'], dbGetTeamsAppliedFor($application['UID']))){
+  if (in_array($application['TID'], dbGetTeamsAppliedFor($application['UID']))){
     printErrorMsg('You have already applied for this team!');
     return false;
   }
@@ -1111,8 +1046,8 @@ function dbAssignUserToTeam($UID, $TID)
 
   if ($result) {
     $result = $result[0]; // deal with the nested arrays
-    if($result["COUNT(*)"] == 1) { // user has previously applied for this team
-      if($result["isApproved"] == false) { // user hasn't been assigned to the team
+    if ($result["COUNT(*)"] == 1) { // user has previously applied for this team
+      if ($result["isApproved"] == false) { // user hasn't been assigned to the team
 	dbUpdate("usersVsTeams", array("isApproved" => true), "UID", $UID, "TID", $TID);
       }
     } else { // user hasn't applied for this team
@@ -1126,7 +1061,7 @@ function dbAssignUserToTeam($UID, $TID)
 function dbGetTeam($TID)
 {
   $teamArray = dbSelect("teams", array("TID"=>$TID), null, 1);
-  if(!empty($teamArray)){
+  if (!empty($teamArray)){
     return $teamArray[0]; // deal with nested arrays
   }
   return false;
@@ -1139,7 +1074,7 @@ function dbGetNumTotalTeams()
   $sql = "SELECT COUNT(*) FROM teams WHERE isApproved = true AND isActive = true";
   $result = db_query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]["COUNT(*)"];
   }
   return false;
@@ -1169,9 +1104,29 @@ function dbGetTeamTIDByNumber($number)
 
 /* dbGetOutreachesForTeam() - return all outreaches for the team given by $TID
  */
-function dbGetOutreachesForTeam($TID)
+function dbGetOutreachesForTeam($TID, $orderParams = null, $limit = null)
 {
-  return dbSimpleSelect("outreach", "TID", $TID);
+  $proxyFields = array(":TID"=>$TID);
+
+  $sql = "SELECT * FROM outreach ";
+  $sql .= "INNER JOIN timesVsOutreach ON timesVsOutreach.OID = outreach.OID ";
+  $sql .= "WHERE outreach.TID = :TID AND outreach.cancelled != 1 ";
+  if ($orderParams == 'upcoming'){
+    $sql .= 'AND timesVsOutreach.startTime > NOW() ';
+  }
+  $sql .= "GROUP BY outreach.OID ";
+  
+  if ($orderParams == 'upcoming'){
+    $sql .= "ORDER BY timesVsOutreach.startTime";
+  } else if ($orderParams == 'logDate'){
+    $sql .= "ORDER BY outreach.logDate DESC";
+  }    
+
+  if ($limit != null){
+    $sql .= " LIMIT $limit";
+  }
+
+  return (db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC));
 }
 
 /* dbGetUsersFromTeam() - return all users for the team given by $TID
@@ -1183,7 +1138,7 @@ function dbGetUsersFromTeam($TID, $type = '')
   $sql = "SELECT * FROM usersVsTeams ";
   $sql .= "INNER JOIN profiles ON profiles.UID = usersVsTeams.UID ";
   $sql .= "WHERE usersVsTeams.TID = :TID AND isApproved = 1 ";
-  if($type != ''){
+  if ($type != ''){
     $sql .= 'AND type = :type ';
     $proxyFields[':type'] = $type;
   }
@@ -1214,7 +1169,7 @@ function dbGetUsersListFromTeam($TID)
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
   $retArr = array();
-  if($result){
+  if ($result){
     foreach($result as $row){
       $retArr[$row['UID']] = $row['firstName'].' '.$row['lastName'];
     }
@@ -1247,7 +1202,7 @@ function dbGetDefaultTIDForUser($UID)
 
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
   
-  if($result){
+  if ($result){
     return $result[0]['TID'];
   }
   return false;
@@ -1289,7 +1244,7 @@ function dbSearchUserByEmail($email)
   $sql .= "OR users.mail = :email";
 
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
-  if(!empty($result)){
+  if (!empty($result)){
     return $result[0]['UID'];
   }
   return false;
@@ -1333,7 +1288,7 @@ function dbGetUserName($UID)
 
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
   
-  if($result){
+  if ($result){
     return $result[0]['firstName'] . ' ' . $result[0]['lastName'];
   }
 
@@ -1349,7 +1304,7 @@ function dbGetTeamsListForUser($UID)
 
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result){
+  if ($result){
     $retArr = array();
     foreach($result as $row){
       $retArr[$row['TID']] = $row['number'];
@@ -1370,7 +1325,7 @@ function dbGetTIDsForUser($UID)
 
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result){
+  if ($result){
     $retArr = array();
     foreach($result as $row){
       $retArr[] = $row['TID'];
@@ -1393,7 +1348,7 @@ function dbGetTeamsForUser($UID)
   $sql .= "AND teams.isApproved = true AND teams.isActive = true";
 
   $result = db_query($sql, $proxyFields);
-  if($result){
+  if ($result){
     return $result->fetchAll(PDO::FETCH_ASSOC);
   }
   return false;
@@ -1458,7 +1413,7 @@ function dbGetUserSignUpType($UID,$OID)
 {
    $types = dbSelect("usersVsOutreach", array("UID"=> $UID, "OID" =>$OID),null, null, "type");
    
-  if($types){
+  if ($types){
     $retArr = array();
     foreach($types as $row){
       $retArr[] = $row['type'];
@@ -1503,7 +1458,7 @@ function dbUserHasProfile($UID)
   $userArray = dbSimpleSelect("profiles", "UID", $UID);
   $count = count($userArray);
 
-  if($count > 1){
+  if ($count > 1){
     dbErrorMsg('User has more than one profile!');
     return true;
   } else if ($count == 1){
@@ -1535,7 +1490,7 @@ function dbGetSecondaryEmailForUser($UID)
 
   $data = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($data){
+  if ($data){
     return $data[0]['email'];
   }
   return false;
@@ -1553,7 +1508,7 @@ function dbCheckSecondaryEmailForUser($email, $UID)
 
   $data = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($data){
+  if ($data){
     return $data[0]['COUNT(*)'] < 1;
   }
   return false;
@@ -1565,7 +1520,7 @@ function dbAddEmailsToUser($UID, $emails)
 {
   foreach($emails as $email){
     $EUID = dbGenericInsert(array("UID" => $UID, "email" => $email), "emailsVsUsers");
-    if($EUID == false){
+    if ($EUID == false){
       return false;
     }
   }
@@ -1624,7 +1579,7 @@ function dbGetApprovedOutreachForUser($UID, $limit = null)
   $sql.="WHERE (usersVsOutreach.UID = :UID OR outreach.UID = :UID) AND outreach.status = :status ";
   $sql.="AND outreach.cancelled = false ";
   
-  if($limit != null){
+  if ($limit != null){
     $sql .= "LIMIT $limit";
   }
 
@@ -1644,7 +1599,7 @@ function dbGetUpcomingOutreachForUser($UID, $limit = null)
   $sql.="WHERE (usersVsOutreach.UID = :UID OR outreach.UID = :UID) AND outreach.status = :status ";
   $sql.="AND outreach.cancelled = false ";
   
-  if($limit != null){
+  if ($limit != null){
     $sql .= "LIMIT $limit";
   }
 
@@ -1669,7 +1624,7 @@ function dbGetUserPrimaryEmail($UID)
     dbErrorMsg("User $UID has no primary email!");
   }
 
-  return -1;
+  return false;
 }
 
 function generateSearchSQL($searchParams, &$proxyFields)
@@ -1678,15 +1633,15 @@ function generateSearchSQL($searchParams, &$proxyFields)
   $UID = $user->uid;
   $sql = "SELECT * FROM outreach ";
 
-  if(isset($searchParams['relation'])) {
+  if (isset($searchParams['signedUp'])) {
     $sql .= 'LEFT JOIN usersVsOutreach ON outreach.OID = usersVsOutreach.OID ';
   }
 
-  if(isset($searchParams['tags'])) {
+  if (isset($searchParams['tags'])) {
     $sql .= 'INNER JOIN tagsVsOutreach ON outreach.OID = tagsVsOutreach.OID ';
   }
 
-  if(isset($searchParams['date']) || isset($searchParams['within5Years']) || isset($searchParams['year'])){
+  if (isset($searchParams['date']) || isset($searchParams['within5Years']) || isset($searchParams['year'])){
     $sql .= 'INNER JOIN timesVsOutreach ON outreach.OID = timesVsOutreach.OID ';
   }
 
@@ -1705,6 +1660,9 @@ function generateSearchSQL($searchParams, &$proxyFields)
     case 'tags': // another special case
       $sql .= tagsSearch_helper($data, $proxyFields);
       break;
+    case 'owner': // another special case
+      $sql .= ownerSearch_helper($data['value'], $proxyFields);
+      break;
     case 'date':
       $sql .= "timesVsOutreach.startTime BETWEEN :startDate AND :endDate ";
       $proxyFields[':startDate'] = $data['start'];
@@ -1717,15 +1675,15 @@ function generateSearchSQL($searchParams, &$proxyFields)
       $sql .= "YEAR(timesVsOutreach.startTime) > YEAR(curdate()) - 5";
       break;
     case 'year':
-      if(isset($searchParams['date']) || isset($searchParams['within5Years'])) {
+      if (isset($searchParams['date']) || isset($searchParams['within5Years'])) {
 	continue; // shouldn't ever have both set
       }
       $sql .= "YEAR(timesVsOutreach.startTime) = :year ";
       $proxyFields[':year'] = $data['year'];
       break;
-    case 'relation':
+    case 'signedUp':
       $teams = dbGetTIDsForUser($UID);
-      if(!isset($searchParams['teams'])) {
+      if (!isset($searchParams['teams'])) {
 	$sql .= '(';
 	$k = 1;
 	foreach($teams as $team){
@@ -1737,7 +1695,7 @@ function generateSearchSQL($searchParams, &$proxyFields)
       } else {
 	$sql .= 'usersVsOutreach.UID = :UID';
       }
-      $proxyFields[':UID'] = $UID;
+      $proxyFields[':UID'] = $searchParams['signedUp']['value'];
       break;
     default:
       $sql .= "outreach.$field ";
@@ -1756,6 +1714,27 @@ function generateSearchSQL($searchParams, &$proxyFields)
     $i++;
   }
 
+  $sql .= ' GROUP BY outreach.OID';
+  dpm($sql);
+  return $sql;
+}
+
+function ownerSearch_helper($owners, &$proxyFields)
+{
+  $i = 1;
+  $length = count($owners);
+  $sql = '(';
+
+  foreach($owners as $owner){
+    $sql .= "outreach.UID = :owner$i";
+    $proxyFields[":owner$i"] = $owner;
+    if ($i < $length){
+      $sql .= ' OR ';
+    }
+    $i++;
+  }
+  $sql .= ')';
+
   return $sql;
 }
 
@@ -1767,7 +1746,7 @@ function statusSearch_helper($statuses, &$proxyFields)
   foreach($statuses as $status){
     $sql .= "outreach.status = :status$i";
     $proxyFields[":status$i"] = $status;
-    if($i < $length){
+    if ($i < $length){
       $sql .= ' OR ';
     }
     $i++;
@@ -1784,7 +1763,7 @@ function teamSearch_helper($teams, &$proxyFields)
   foreach($teams as $team){
     $sql .= "outreach.TID = :TID$i";
     $proxyFields[":TID$i"] = $team;
-    if($i < $length){
+    if ($i < $length){
       $sql .= ' OR ';
     }
     $i++;
@@ -1801,7 +1780,7 @@ function tagsSearch_helper($tags, &$proxyFields)
   foreach($tags as $tag){
     $sql .= "tagsVsOutreach.OTID = :OTID$i";
     $proxyFields[":OTID$i"] = $tag;
-    if($i < $length){
+    if ($i < $length){
       $sql .= ' OR ';
     }
     $i++;
@@ -1861,7 +1840,7 @@ function dbGetAllAssociatedOutreachForUser($UID)
   foreach($teams as $team){
     $sql .= "outreach.TID = :TID$i";
     $proxyFields[":TID$i"] = $team;
-    if($i < $length){
+    if ($i < $length){
       $sql .= ' OR ';
     }
     $i++;
@@ -1905,55 +1884,48 @@ function dbGetNumOutreachesForUserForTeam($UID, $TID)
   
   $result = (db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC));
 
-  if($result){
+  if ($result){
     return $result[0]['COUNT(DISTINCT usersVsOutreach.OID)'];
   }
   return false;
 }
 
-/* Returns list of outreach where user is a contributor. */
-function dbGetOutreachForUser($UID)
+
+/* dbGetOutreachForUser() - returns all outreaches associated with the given user
+ */
+function dbGetOutreachForUser($UID, $orderParams = null, $limit = null)
 {
   $proxyFields = array(":UID"=>$UID);
 
-  $sql = "SELECT DISTINCT outreach.* FROM outreach ";
-  $sql .= "INNER JOIN usersVsOutreach ON outreach.OID = usersVsOutreach.OID ";
-  $sql .= "WHERE usersVsOutreach.UID = :UID";
+  $sql = "SELECT * FROM outreach ";
+  $sql .= "INNER JOIN timesVsOutreach ON timesVsOutreach.OID = outreach.OID ";
+  $sql .= "LEFT JOIN usersVsOutreach ON outreach.OID = usersVsOutreach.OID ";
+  $sql .= "WHERE (outreach.UID = :UID OR usersVsOutreach.UID = :UID) AND outreach.cancelled != 1 ";
+  if ($orderParams == 'upcoming'){
+    $sql .= 'AND timesVsOutreach.startTime > NOW() ';
+  }
+  $sql .= "GROUP BY outreach.OID ";
   
-  return (db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC));
+  if ($orderParams == 'upcoming'){
+    $sql .= "ORDER BY timesVsOutreach.startTime";
+  }
+
+  if ($limit != null){
+    $sql .= " LIMIT $limit";
+  }
+  dpm($sql);
+  $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
+
+  if ($result){
+    dpm($result);
+    return $result;
+  }
+  return false;
 }
 
 function dbGetOwnedOutreachForUser($UID)
 {
   return dbSimpleSelect("outreach", "UID", $UID);
-}
-
-//Does not work as intended. Use dbGetAllAssociatedOutreachForUser() instead.
-/*function dbGetAllOutreachForUser($UID)
-{
-  $proxyFields = array(":UID"=>$UID);
-
-  $sql = "SELECT * FROM outreach ";
-  $sql .= "INNER JOIN usersVsOutreach ON outreach.OID = usersVsOutreach.OID ";
-  $sql .= "WHERE usersVsOutreach.UID = :UID OR  outreach.UID = :UID";
-  
-  return (db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC));
-  }*/
-
-function dbFindUsers($searchString)
-{
-  $sql = "SELECT * FROM users WHERE ";
-  $sql .= "(firstName = :firstName OR lastName = :lastName)";
-
-  if(ctype_space($searchString)){
-      $firstAndLast = "firstname lastname";
-      $firstAndLast = explode(" ", $searchString);
-      $proxyFields = array(":firstName" => $firstAndLast[0], ":lastName" => $firstAndLast[1]);
-  } else {
-      $proxyFields = array(":firstName" => $searchString, ":lastName" => $searchString);
-  }
-
-  return (db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC));
 }
  
 /* --------------------------------------------------------- MEDIA -------------------------------------------- */
@@ -2026,7 +1998,7 @@ function dbGetHTID($TID, $year)
   $proxyFields = array(":TID" => $TID, ":year"=>$year);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result)
+  if ($result)
     {
   return $result;
     }
@@ -2038,21 +2010,6 @@ function dbRemoveOldHours($HTID)
   return dbRemoveEntry("oldHoursVsTeams", 'HTID', $HTID);
 }
 
-
-function dbGetHourOffset($HTID)
-{
-  $sql = "SELECT * FROM oldHoursVsTeams ";
-  $sql .= "WHERE HTID = :HTID ";
-  $proxyFields = array(":HTID" => $HTID);
-  $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
-
-  if($result)
-    {
-  return $result;
-    }
-  return false;
-}
-
 function dbGetOffsetHours($TID)
 {
   $sql = "SELECT numberOfHours, year, HTID FROM oldHoursVsTeams ";
@@ -2060,14 +2017,14 @@ function dbGetOffsetHours($TID)
   $proxyFields = array(":TID" => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result)
+  if ($result)
     {
   return $result;
     }
   return false;
 }
 
-/* dbLogHours() - creates function to log hours given the user, outreach event, number of hours etc...
+/* dbLogHours() - creates function to log hours given the user, outreach event, number of hours etc.
  */
 function dbUpdateHours($row, $HID)
 {
@@ -2135,7 +2092,7 @@ function dbDeleteNotifications($UID, $limit = 0)
   $sql = "DELETE FROM notifications ";
   $sql .= "WHERE UID = :UID ";
   $sql .= "ORDER BY notifications.dateTargeted DESC ";
-  if($limit != 0){
+  if ($limit != 0){
         $sql .= "LIMIT :limit";
 	$proxyFields[':limit'] = $limit;
   }
@@ -2156,7 +2113,7 @@ function dbGetNotificationsForUser($UID, $limit = null)
   $sql .= "AND notifications.dateTargeted <= NOW() ";
   $sql .= "ORDER BY notifications.dateTargeted DESC ";
 
-  if($limit != null){
+  if ($limit != null){
     $sql .= "LIMIT $limit";
   }
 
@@ -2171,7 +2128,7 @@ function dbGetNumNotificationsForUser($UID)
   $proxyFields = array(":UID" => $UID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result) {
+  if ($result) {
     return $result[0]['COUNT(DISTINCT NID)'];
   }
 
@@ -2187,7 +2144,7 @@ function dbGetNotificationsForOutreach($OID, $limit = null)
   $sql .= "WHERE notifications.OID = :OID ";
   $sql .= "ORDER BY notifications.dateTargeted ";
 
-  if($limit != null){
+  if ($limit != null){
     $sql .= "LIMIT $limit";
   }
 
@@ -2304,7 +2261,7 @@ function dbGetRIDForTeam($UID, $TID)
 
   $proxyFields = array(":UID" => $UID, ':TID' => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
-  if($result){
+  if ($result){
     return $result[0]['RID'];
   }
   return false;
@@ -2322,7 +2279,7 @@ function dbGetRoleForTeam($UID, $TID)
 
   $proxyFields = array(":UID" => $UID, ':TID' => $TID);
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
-  if($result){
+  if ($result){
     return $result[0]['displayName'];
   }
   return false;
@@ -2337,7 +2294,7 @@ function dbGetAllRoles()
   $proxyFields = array();
   $result = db_query($sql, $proxyFields)->fetchAll(PDO::FETCH_ASSOC);
 
-  if($result){
+  if ($result){
     foreach($result as $row){
       $retArr[$row['RID']] = $row['displayName'];
     }
@@ -2365,9 +2322,9 @@ function dbFormatPhoneNumber($phone)
   $length = strlen($phone);
   $tempPhone = '';
 
-  if($length == 10){
+  if ($length == 10){
     $tempPhone = "(" .substr($phone,0,3). ") " .substr($phone,3,3). "-" .substr($phone,6,4);
-  } else if($length == 7){
+  } else if ($length == 7){
     $tempPhone = substr($phone,0,3). "-" .substr($phone,3,7);
   } else {
     $tempPhone = $phone;

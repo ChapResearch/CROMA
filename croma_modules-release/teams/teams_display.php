@@ -12,7 +12,6 @@ include_once(MODULES_FOLDER."/teams/applyForTeams.php");
 include_once(MODULES_FOLDER."/teams/manageTeams.php");
 include_once(MODULES_FOLDER."/teams/manageUsersForTeam.php");
 include_once(MODULES_FOLDER."/teams/viewUsersForTeam.php");
-include_once(MODULES_FOLDER."/teams/userStatsForTeam.php");
 include_once(MODULES_FOLDER."/teams/teamOutreachSettings.php");
 include_once(MODULES_FOLDER."/teams/manageTags.php");
 include_once(MODULES_FOLDER."/teams/publicOutreachForTeams.php");
@@ -42,8 +41,6 @@ $otherBlocks = array(array("id" => "viewTeam", "title" => "CROMA - View Team", "
 		     array("id" => "manageUserTeams", "title" => "CROMA - Manage User Teams", "content" => "manageUserTeams"),
 		     array("id" => "approveUser", "title" => "CROMA - Approve User", "content" => "approveUser"),
 		     array("id" => "viewUsersAwaitingApproval", "title" => "CROMA - View Users Awaiting Approval", "content" => "viewUsersAwaitingApproval"),
-		     array("id" => "viewUserHoursForTeam", "title" => "CROMA - User Hours For Team", "content" => "viewUserHoursForTeam"),
-		     array("id" => "viewUserEventsForTeam", "title" => "CROMA - User Events For Team", "content" => "viewUserEventsForTeam"),
 		     array("id" => "allTeamOutreach", "title" => "CROMA - All Team Outreach", "content" => "allTeamOutreach"),
 		     array("id" => "outreachSettingsHeader", "title" => "CROMA - Outreach Settings Header", "content" => "outreachSettingsHeader"),
 );		   

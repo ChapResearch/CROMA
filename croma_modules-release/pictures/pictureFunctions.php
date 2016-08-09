@@ -1,5 +1,18 @@
 <?php
 
+/*
+  ---- pictures/pictureFunctions.php ----
+
+  used to handle all aspects of pictures within CROMA
+
+  - Contents -
+  generatePictureField() - creates the field to upload an image
+  addPicture(), removePicture(), replacePicture() - handles the image in Drupal
+  addUsage() - tells Drupal the file is in use
+  bulkSavePictures() - saves multiple pictures at once
+  generateURL() - creates the URL to view the image
+*/
+
 /* generatePictureField() - returns a render array of the picture field. The FID will be filled into the form state for the value of the field within the form API.
  */
 function generatePictureField($title, $defaultValue, $prefix = '', $suffix = '')
@@ -22,7 +35,7 @@ function addPicture($FID, $moduleName)
   $f = file_load($FID);
   $f->status = FILE_STATUS_PERMANENT;
   file_save($f);
-  file_usage_add($f, "CROMA - $moduleName", 'pictures', $f->fid); // tells Drupal we're using the file
+  addUsage($f, $moduleName);// tells Drupal we're using the file
 }
 
 function removePicture($FID, $moduleName)

@@ -1,23 +1,19 @@
 <?php
 
-/* ---------------------------- display.php ---------------------------------
-   This file creates blocks that implement displaying of a user.
+/*
+  ---- users/viewUsers.php ----
+
+  this file creates blocks that implement displaying of a user
 
   - Contents -
   viewUser() - allows a user to view their personal information from the users table in the database
   myDashboardHeader() - used for switching teams on my dashboard (not used though)
   viewUserProfileSummary() - used on my dashboard to view user and view user teams
-
 */   
 
-// allows a user to view their personal information from the users table in the database
-
-include_once(DATABASE_FOLDER."/croma_dbFunctions.php");
-
-
 //  viewUser() - allows a user to view their personal information from the users table in the database
-
-function viewUser(){
+function viewUser()
+{
   global $user;
   $currentUID = $user->uid;
   $params = drupal_get_query_parameters();
@@ -26,13 +22,13 @@ function viewUser(){
   if(isset($params["UID"])) {
     $UID = $params["UID"];
   } else {
-    drupal_set_message('No user specified!', 'error');
+    drupal_set_message('No user specified.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
-  // checks that the user youre looking at is on the same team
+  // checks that the user being viewed shares a team with the user currently viewing
   if(!($UID == $currentUID || isOnMyTeam($UID))){
-    drupal_set_message("You can't view this profile!", 'error');
+    drupal_set_message("You can't view this profile.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -49,7 +45,7 @@ function viewUser(){
     }
   }
 
-  if($user->uid==$UID){
+  if($user->uid == $UID){
     $canEdit = true;
   }
 
@@ -64,7 +60,7 @@ function viewUser(){
 
   $markup .= '<table id="photoAndEdit"><tr><td style="padding:0px;">';  
 
-  // if its your profile, then you can edit your picture
+  // if the profile belongs to the currently logged in user, the picture should be editable
   if($canEdit){
     $markup .= '<div align="right">';
     $markup .= '<a href= "?q=editThumbnail';
@@ -111,7 +107,7 @@ function viewUser(){
 
   $markup .= '<div style="width:70%; float:right; padding-left:10px">';
   $markup .= '<table id="miniViewTeam" style="margin:16px 0px 0px 0px"><tr><td><b>Role: </b>'.ucfirst($profile['type']) . '</td>'; 
-  $markup .= '<td><b>Position: </b> ' . strip_tags($profile['position'], ALLOWED_TAGS) . '</td>';
+  $markup .= '<td><b>Position: </b> ' . strip_tags($profile['position']) . '</td>';
 
   if($profile['grade'] == '0'){
     $markup .= '<tr><td><b>Grade: </b> N/A</td>';
@@ -134,7 +130,7 @@ function viewUser(){
   // displays teams the user is on
 
   $teamNumbers = '';
-  $first = true;
+  $first = true; // used to put commas in the right places
   $teams = dbGetTeamsForUser($UID);
   
   foreach($teams as $team) {
@@ -146,21 +142,25 @@ function viewUser(){
     }
   }
   
-  if(count($teams)>1){
+  if(count($teams) > 1){
     $teamLabel = 'Teams';
   } else {
     $teamLabel = 'Team';
   }
   
-  $markup .= '<tr><td><a href="?q=manageUserTeams"><b>' . $teamLabel . ':</b></a> ' . $teamNumbers . '</td>';
+  if ($UID == $currentUID){
+    $markup .= '<tr><td><a href="?q=manageUserTeams"><b>' . $teamLabel . ':</b></a> ' . $teamNumbers . '</td>';
+  }else{
+    $markup .= '<tr><td><b>' . $teamLabel . ':</b> ' . $teamNumbers . '</td>';
+  }
 
   // displays user hours
   $numberOfHours = dbGetUserHours($UID);
 
   if($numberOfHours != 0){
-    $markup .= "<td><a href=\"?q=viewHours&UID=$UID\"><b>Number Of Hours:</b></a> $numberOfHours</td>";
+    $markup .= "<td><a href=\"?q=viewHours&UID=$UID\"><b>Number of Hours:</b></a> $numberOfHours</td>";
   } else {
-    $markup .= "<td><b>Number Of Hours:</b> No Hours!</td>"; 
+    $markup .= "<td><b>Number of Hours:</b> No Hours!</td>"; 
   }
 
   // displays user bio
@@ -172,38 +172,7 @@ function viewUser(){
   return array("#markup"=>$markup);
 }
 
-// myDashboardHeader() - used for switching teams on my dashboard (not used though)
-function myDashboardHeader($form, &$form_state)
-{
-  global $user;
-  $UID = $user->uid;
-  $team = getCurrentTeam();
-  $form = array();
-
-  if(empty($team)) {
-    $TID = 0; //TODO
-  } else {
-    $TID = $team['TID'];
-  }
-
-  $teams = dbGetTeamsForUser($UID);
-  $choices = array();
-
-  if(!empty($teams)) {
-    foreach($teams as $userTeam) {
-      $choices[$userTeam['TID']] = $userTeam['number'];
-    }
-  }
-
-  // BUTTON TO ADD OUTREACH FOR YOUR CURRENT TEAM
-  $form['button'] = array(
-    '#markup' => '<td style="text-align:right; padding:0px"><a href="?q=outreachForm"><button type="button" class="largeButton">+ Outreach</button></a></td></tr></table>'
-			  );
-
-  return $form;
-}
-
-// viewUserProfileSummary() - used on my dashboard to view user and view user teams
+// viewUserProfileSummary() - used on my dashboard to view brief profile data
 function viewUserProfileSummary()
 {
   global $user;
@@ -217,11 +186,11 @@ function viewUserProfileSummary()
 
   $profile = dbGetUserProfile($UID);
 
-  // CREATE TABLE, DISPLAY USER NAME
+  // create table, display user name
   $markup = '<table id="miniViewUser" style="margin:102px 0px 0px 0px"><tr><td colspan="6" style="text-align:center"><h2><b>' . $profile['firstName'] . ' ' . $profile['lastName'] . '</b></h2></td>';
   $markup .='<tr><td colspan="6" style="text-align:center">';
 
-  // DISPLAY PICTURE IF USER HAS ONE
+  // display picture if user has one
   if(!empty($profile['FID'])) {
     $FID = $profile['FID'];
     $file = file_load($FID);
@@ -229,19 +198,18 @@ function viewUserProfileSummary()
     $variables = array('style_name'=>'profile','path'=>$uri,'width'=>'150','height'=>'150');
     $image = theme_image_style($variables);
     $markup .= $image;
-    // DEFAULT PICTURE DISPLAYED
-  } else {
+  } else {    // default picture displayed
     $markup .= '<img src="/images/defaultPics/user.png">';
     }
 
   $markup .='</td></tr><tr>';
 
-  // MY PROFILE BUTTON TO VIEW USER
+  // my profile button to view full user profile
   $markup .= '<td colspan="3" style="text-align:left"><a href="?q=viewUser';
   $markup .= '&UID=' . $UID . '">';
   $markup .= '<div class="help tooltip4"><button type="button">My Profile</button>';
 
-  // MY TEAMS BUTTON TO MANAGE TEAMS FOR USER
+  // my teams button to manage teams for user
   $markup .= '<span id="helptext"; class="helptext tooltiptext4">';
   $markup .= 'Click here to view/edit your user profile and to manage your teams.';
   $markup .= '</span></div></a>';
@@ -255,62 +223,5 @@ function viewUserProfileSummary()
   
   return array('#markup' => $markup);
 }
-
-
-// VIEW USER PROFILE SUMMARY BACKUP WITH BUTTONS ON THE RIGHT NEXT TO THE PICTURE
-
-/*
-
-function viewUserProfileSummary()
-{
-  global $user;
-  $params = drupal_get_query_parameters();
-
-  if (isset($params["UID"]))  {
-    $UID = $params["UID"];
-  } else {
-    $UID = $user->uid;
-  }
-
-  $profile = dbGetUserProfile($UID);
-  $markup = '<table id="miniViewUser" style="margin:97px 0px 0px 0px"><tr><td colspan="6" style="text-align:center"><h2><b>' . $profile['firstName'] . ' ' . $profile['lastName'] . '</b></h2></td>';
-  $markup .='<tr><td colspan="3" style="text-align:right">';
-
-
-  if(!empty($profile['FID'])) {
-    $FID = $profile['FID'];
-    $file = file_load($FID);
-    $uri = $file->uri;
-    $variables = array('style_name'=>'profile','path'=>$uri,'width'=>'150','height'=>'150');
-    $image = theme_image_style($variables);
-    $markup .= $image;
-  } else {
-    $markup .= '<img src="http://www.agentdesks.com/img/testimonial.png">';
-    }
-
-  $markup .='</td>';
-
-  $markup .= '<td colspan="3" style="text-align:left"><a href="?q=viewUser';
-  $markup .= '&UID=' . $UID . '">';
-  $markup .= '<div class="help tooltip1"><button type="button">My Profile</button></a>';
-
-  $markup .= '<span id="helptext"; class="helptext tooltiptext1">';
-  $markup .= 'Click here to view/edit your user profile and to manage your teams.';
-  $markup .= '</span></div>';
-
-  $markup .= '</td></tr><div align="right"><tr>';
-
-  $markup .= '<td colspan="3" style="text-align:right"><a href= "?q=manageUserTeams">';
-  //  $markup .= '<div align="right"><tr><td colspan="3" style="text-align:right"><a href= "?q=manageUserTeams">';
-  $markup .= '<div class="help tooltip1"><button type="button">My Teams</button><span id="helptext"; class="helptext tooltiptext1">Click here to create, apply to, or leave a team.</span></div></a></td>';  
-
-
-  $markup .= '</tr></div></table>';
-  
-  return array('#markup' => $markup);
-}
-
- */
-
 
 ?> 

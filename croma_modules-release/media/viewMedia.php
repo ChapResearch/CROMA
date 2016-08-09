@@ -17,7 +17,7 @@ function viewIncomingMedia()
   $UID = $user->uid;
 
   if(dbGetTeamsForUser($user->uid) == false){
-    drupal_set_message("You don't have a team assigned!", 'error');
+    drupal_set_message("You don't have a team assigned.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -81,7 +81,7 @@ function viewPastUserMedia()
 
   // checks to see if the user has a team
   if(dbGetTeamsForUser($user->uid) == false){
-    drupal_set_message("You don't have a team assigned!", 'error');
+    drupal_set_message("You don't have a team assigned.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -90,9 +90,9 @@ function viewPastUserMedia()
 
   $medias = dbGetPastMediaForUser($UID);
   // create header
-  $markup = '<h1>Media</h1><br><div class="help tooltip1"><h2>Assigned Media</h2>';
+  $markup = '<h1>Media</h1><br><div class="help tooltip2"><h2>Assigned Media</h2>';
 
-  $markup .= '<span id="helptext"; class="helptext tooltiptext1">';
+  $markup .= '<span id="helptext"; class="helptext tooltiptext2">';
   $markup .= 'This is past media that you have already assigned to outreach.';
   $markup .= '</span></div>';
 
@@ -143,14 +143,14 @@ function viewMedia()
   global $user;
 
   if(dbGetTeamsForUser($user->uid) == false){
-    drupal_set_message("You don't have a team assigned!", 'error');
+    drupal_set_message("You don't have a team assigned.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
   $params = drupal_get_query_parameters();
 
   if(!isset($params['OID'])){
-    drupal_set_message('No outreach selected!', 'error');
+    drupal_set_message('No outreach selected.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -164,9 +164,7 @@ function viewMedia()
   $markup .= "<table><tr><td><h1>Media for \"$outreachName\" </h1></td>";
   $markup .= '<td style="text-align:right">';
   // upload media button
-  $markup .= "<a href=\"?q=uploadMedia&OID=$OID\"><button>Upload Media</button></a>";
-  // back to outreach button
-  $markup .= "<a href=\"?q=viewOutreach&OID=$OID\"><button>Back to Outreach</button></a></td></tr></table>";
+  $markup .= "<a href=\"?q=uploadMedia&OID=$OID\"><button>Upload Media</button></a></td></tr></table>";
 
   $media = dbGetMediaForOutreach($OID);
   // create table
@@ -182,7 +180,7 @@ function viewMedia()
       $UIDofMID = dbGetUserForMedia($MID);
       $profile = dbGetUserProfile($UIDofMID);
     
-      $markup .= '<tr><td><a href=' . $url .'><img src="' . $url . '" width="200px" height="200px"></a></td>';
+      $markup .= '<tr><td><a href=' . $url .'><img src="' . $url . '" width="150px" height="150px"></a></td>';
       $markup .= '<td>' . $m['title'] .'</td>';
       $markup .= '<td>' . wordwrap(chopString($m['description'],30),15,"<br>\n",TRUE) . '</td>';
       $markup .= "<td>" . $profile['firstName'] . ' ' . $profile['lastName'] . "</td>";

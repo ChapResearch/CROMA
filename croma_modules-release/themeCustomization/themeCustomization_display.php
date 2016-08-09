@@ -11,8 +11,10 @@ include_once(MODULES_FOLDER."/themeCustomization/help.php");
 
 $otherBlocks = array(
 		     array("id" => "publicHomePageStatistics", "title" => " CROMA - Public Home Page Statistics", "content" => "publicHomePageStatistics"),
-		     array("id" => "publicHomePageLogos", "title" => " CROMA - Public Home Page Logos", "content" => "publicHomePageLogos"),
-		     array("id" => "publicHomePageCROMALogoAndInfo", "title" => " CROMA - Public Home Page CROMA Logo and Info", "content" => "publicHomePageCROMALogoAndInfo"),
+		     array("id" => "publicHomePageCRLogo", "title" => " CROMA - Public Home Page CR Logo", "content" => "publicHomePageCRLogo"),
+		     array("id" => "publicHomePageFRCLogo", "title" => " CROMA - Public Home Page FRC Logo", "content" => "publicHomePageFRCLogo"),
+		     array("id" => "publicHomePageCROMALogo", "title" => " CROMA - Public Home Page CROMA Logo", "content" => "publicHomePageCROMALogo"),
+		     array("id" => "publicHomePageInfo", "title" => " CROMA - Public Home Page Info", "content" => "publicHomePageInfo"),
 		     array("id" => "displayHelp", "title" => " CROMA - Display Help", "content" => "displayHelp")
 		     );
 

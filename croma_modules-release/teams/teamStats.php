@@ -15,7 +15,7 @@ function viewHoursForTeam()
 
   if(dbGetTeamsForUser($user->uid) == NULL)
     {
-      drupal_set_message("You don't have a team assigned!", 'error');
+      drupal_set_message("You don't have a team assigned.", 'error');
       drupal_goto($_SERVER['HTTP_REFERER']);
       return;
     }
@@ -64,7 +64,7 @@ function viewEventsForTeam()
 
   if(dbGetTeamsForUser($user->uid) == NULL)
     {
-      drupal_set_message("You don't have a team assigned!", 'error');
+      drupal_set_message("You don't have a team assigned.", 'error');
       drupal_goto($_SERVER['HTTP_REFERER']);
       return;
     }

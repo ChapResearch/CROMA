@@ -19,7 +19,7 @@ if (isset($_GET['teamNumber'])){
   return;
 }
 
-$fontpath = realpath('.'); //replace . with a different directory if needed
+$fontpath = realpath($modulesBasePath.'/images'); //replace . with a different directory if needed
 putenv('GDFONTPATH='.$fontpath);
 
 // General settings

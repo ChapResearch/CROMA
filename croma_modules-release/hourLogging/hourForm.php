@@ -1,22 +1,22 @@
 <?php
 
-/*
-  ---- hours/hourForm.php ----
-  used to allow users to add/edit hours
+   /*
+     ---- hours/hourForm.php ----
+     used to allow users to add/edit hours
 
-  - Contents -
-  addHourRow() - helper function for adding rows through AJAX
-  removeHourRow() - helper function for removing rows through AJAX
-  hoursForm() - form to allow entering/editing of old, pre-CROMA hours 
-  hoursForm_validate() - checks that the years and hour counts are reasonable
-  hoursForm_submit() - adds/edits the old hours
-*/   
+     - Contents -
+     addHourRow() - helper function for adding rows through AJAX
+     removeHourRow() - helper function for removing rows through AJAX
+     hoursForm() - form to allow entering/editing of old, pre-CROMA hours 
+     hoursForm_validate() - checks that the years and hour counts are reasonable
+     hoursForm_submit() - adds/edits the old hours
+   */   
 
-// adds new row
+   // adds new row
 function addHourRow($form, &$form_state) {
   $form_state['numRows']++;
   $form_state['rebuild'] = TRUE;
-}
+   }
 
 // deletes row
 function removeHourRow($form, &$form_state) {
@@ -37,8 +37,8 @@ function hoursForm($form, &$form_state)
   
   // checking that you are on a team
   if(dbGetTeamsForUser($user->uid) == NULL){
-      drupal_set_message("You don't have a team assigned!", 'error');
-      drupal_goto($_SERVER['HTTP_REFERER']);
+    drupal_set_message("You don't have a team assigned.", 'error');
+    drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
   if(isset($params['HID'])){
@@ -69,13 +69,13 @@ function hoursForm($form, &$form_state)
     $OID = $hour['OID'];
     $form_state['OID'] = $OID;
     if ($hour['isApproved']){
-      drupal_set_message('Note that this hour will have to be re-approved once changes are made!', 'error');
+      drupal_set_message('Note that this hour will have to be re-approved once changes are made.', 'error');
     }
   }
 
   // checking that you are accessing this page with a valid outreach
   if (!isset($OID) && !isset($params['HID'])){
-    drupal_set_message("No outreach selected!", 'error');
+    drupal_set_message("No outreach selected.", 'error');
     return;
   }
 
@@ -91,7 +91,7 @@ function hoursForm($form, &$form_state)
   if(!(hasPermissionForTeam('editAnyHours', dbGetTeamForOutreach($OID))
        || isMyOutreach($OID) 
        || dbIsUserSignedUp($user->uid, $OID))){
-    drupal_set_message("You don't have permission to log hours for this outreach!", 'error');
+    drupal_set_message("You don't have permission to log hours for this outreach.", 'error');
     return;
   }
 
@@ -131,6 +131,31 @@ function hoursForm($form, &$form_state)
       $form_state['numRows'] = 1;
     }
 
+    if(!hasPermissionForTeam('editAnyHours', $TID)){
+      $signUpInfo = dbGetUserSignUpInfo($UID,$OID);
+      $numSignUps = count($signUpInfo);
+      $signUpCountLoop = 0;
+      $type = array();
+      foreach($signUpInfo as $info){
+	if($numSignUps > 1 && ($signUpCountLoop != $numSignUps-1) && ($form_state['numRows'] != $numSignUps)){
+	  $form_state['numRows']++;
+	}
+
+	if($info['type'] == 'prep'){
+	  $type[$signUpCountLoop] = array('prep'=>'Preparation');
+	} else if($info['type'] == 'atEvent'){
+	  $type[$signUpCountLoop] = array('atEvent'=>'At Event');
+	} else if($info['type'] == 'writeUp'){
+	  $type[$signUpCountLoop] = array('writeUp'=>'Write-Up');
+	} else if($info['type'] == 'followUp'){
+	  $type[$signUpCountLoop] = array('followUp'=>'Follow Up');
+	} else if($info['type'] == 'other'){
+	  $type[$signUpCountLoop] = array('prep'=>'Other');
+	}
+	$signUpCountLoop ++;
+      }
+    }
+
     // looping through the rows
     for($i = 0; $i < $form_state['numRows']; $i++){
 
@@ -149,7 +174,12 @@ function hoursForm($form, &$form_state)
 						'#default_value'=>$new?'':$hour['numberOfHours']
 						);
 
-      $types = array('prep'=>'Preparation','atEvent'=>'At Event','writeUp'=>'Write-Up','followUp'=>'Follow Up', 'other'=>'Other');
+      if(hasPermissionForTeam('editAnyHours', $TID)){
+	$types = array('prep'=>'Preparation','atEvent'=>'At Event','writeUp'=>'Write-Up','followUp'=>'Follow Up', 'other'=>'Other');
+      } else {
+	$types = $type[$i];
+      }
+
       $form['fields']["type-$i"]=array(
 				       '#prefix'=>'<td colspan="1" style="text-align:left; width:20%;">',
 				       '#type'=>'radios',
@@ -198,11 +228,11 @@ function hoursForm($form, &$form_state)
     }
 
     $form['fields']['submit']=array(
-			  '#prefix'=>'<tr><td colspan="7" style="text-align:right">',
-			  '#type'=>'submit',
-			  '#value'=>t('Submit'),
-			  '#suffix'=>'</td></tr>',
-			  );
+				    '#prefix'=>'<tr><td colspan="7" style="text-align:right">',
+				    '#type'=>'submit',
+				    '#value'=>t('Submit'),
+				    '#suffix'=>'</td></tr>',
+				    );
 
     $form['fields']['tableFooter']=array(
 					 '#markup'=>'</table>'
@@ -219,12 +249,21 @@ function hoursForm_validate($form, $form_state)
   for($i = 0; $i < $form_state['numRows']; $i++){
     if(empty($form_state['values']["numberOfHours-$i"])){
       // hours cannot be empty
-      form_set_error("fields][numberOfHours-$i",'Number of hours cannot be empty');
+      form_set_error("fields][numberOfHours-$i",'Number of hours cannot be empty.');
     }
-
-    // type cannot be empty
+  }
+  for($i = 0; $i < $form_state['numRows']; $i++){
+    if(!empty($form_state['values']["numberOfHours-$i"])){
+      if(!ctype_digit($form_state['values']["numberOfHours-$i"])){
+	// hours cannot be empty
+	form_set_error("fields][numberOfHours-$i",'You must input only numeric digits.');
+      }
+    }
+  }
+  // type cannot be empty
+  for($i = 0; $i < $form_state['numRows']; $i++){
     if(empty($form_state['values']["type-$i"])){
-      form_set_error("fields][type-$i",'Type cannot be empty'); 
+      form_set_error("fields][type-$i",'Type cannot be empty.'); 
     }
   }
 }

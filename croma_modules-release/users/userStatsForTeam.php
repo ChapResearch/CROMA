@@ -18,7 +18,7 @@ function viewUserHoursForTeam()
   // if the user doesn't have a team
   if(dbGetTeamsForUser($user->uid) == NULL){
     $link = '?q=manageUserTeams';
-    $msg = "You don't have a team assigned! Click <a href=\"$link\">here</a> to manage your teams.";
+    $msg = "You don't have a team assigned. Click <a href=\"$link\">here</a> to manage your teams.";
     drupal_set_message($msg, 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
@@ -40,7 +40,7 @@ function viewUserHoursForTeam()
   $teamName = dbGetTeamName($TID);
 
   // create page header and table
-  $markup = "<table><h1>My Hours For Team $teamName</h1></table>";
+  $markup = "<table><h1>My Hours For $teamName</h1></table>";
 
   $markup .= '<table class="infoTable">';
   $markup .= '<tr>';
@@ -83,7 +83,7 @@ function viewUserEventsForTeam()
 
   // if user does not have a team
   if (dbGetTeamsForUser($user->uid) == NULL){
-      drupal_set_message("You don't have a team assigned!", 'error');
+      drupal_set_message("You don't have a team assigned.", 'error');
       drupal_goto($_SERVER['HTTP_REFERER']);
     }
 
@@ -104,7 +104,7 @@ function viewUserEventsForTeam()
   $teamName = dbGetTeamName($TID);
 
   // create page header and table
-  $markup = "<table><h1>My Outreaches For Team $teamName</h1></table>";
+  $markup = "<table><h1>My Outreaches For $teamName</h1></table>";
   $markup .= '<table class="infoTable">';
   $markup .= '<tr>';
   $markup .= '<th colspan="3">Outreach Name</th>';

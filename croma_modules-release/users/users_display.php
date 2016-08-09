@@ -11,6 +11,7 @@ include_once(MODULES_FOLDER."/users/profileForm.php");
 include_once(MODULES_FOLDER."/users/usersSearch.php");
 include_once(MODULES_FOLDER."/users/userStats.php");
 include_once(MODULES_FOLDER."/users/deleteUser.php");
+include_once(MODULES_FOLDER."/users/userStatsForTeam.php");
 
 $formBlocks = array(
 		    array("id" => "profileForm", "title" => "CROMA - Create/Edit Profile", "form" => "profileForm"),
@@ -22,6 +23,8 @@ $formBlocks = array(
 
 $otherBlocks = array(array("id" => "viewUser", "title" => "CROMA - View User", "content" => "viewUser"),
 		     array("id" => "viewUserProfileSummary", "title" => "CROMA - User Mini Profile", "content" => "viewUserProfileSummary"),
+		     array("id" => "viewUserHoursForTeam", "title" => "CROMA - User Hours For Team", "content" => "viewUserHoursForTeam"),
+		     array("id" => "viewUserEventsForTeam", "title" => "CROMA - User Events For Team", "content" => "viewUserEventsForTeam"),
 		     array("id" => "usersSearchHeader", "title" => "CROMA - Users Search Header", "content" => "usersSearchHeader"));
 
 

@@ -16,7 +16,7 @@ function outreachSettingsHeader()
 
   // if the team does not have permission to access team outreach settings
   if(teamIsIneligible($TID)) {
-    drupal_set_message('Your team does not have permission to access this page!', 'error');
+    drupal_set_message('Your team does not have permission to access this page.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 

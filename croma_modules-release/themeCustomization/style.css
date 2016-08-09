@@ -1,3 +1,5 @@
+/* Setting the body preferences (i.e. color, font, font size, etc.)  across CROMA */
+
 body {
   margin:0;
   padding:0;
@@ -9,6 +11,7 @@ body {
   background-position:top;
 }
 
+/* Styling the "normal" buttons across CROMA (not submit buttons - those are separate) */
 button {
   color: #ffffff;
   background: #27408b;
@@ -22,23 +25,27 @@ button {
   font-family: 'Open Sans', sans-serif;
   text-decoration: none;
   cursor: pointer;
-   -webkit-border-radius: 3px;
-   -moz-border-radius: 3px;
-   border-radius: 3px;
+/* Following are attributes to ensure cross-browser compatibility for CROMA button styling */
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
 }
 
+/* Changing background color of site-wide buttons when hovering over them (to a lighter shade of blue) */
 button:hover {
   color: #ffffff;
   background: #476AD1;
   text-decoration: none;
 }
 
+/* Setting site-wide buttons to a background of the color grey if they are disabled (i.e. user does not have correct permissions)*/
 button:disabled {
   color: #ffffff;
   background: #808080;
   text-decoration: none;
 }
 
+/* Separate styling for larger-sized buttons */
 button.largeButton {
     color: #ffffff;
     background: #27408B;
@@ -50,22 +57,38 @@ button.largeButton:hover {
   background: #476AD1;
 }
 
+/* Ensuring that the AJAX progress bar does not show up */
 .ajax-progress .message {
     display:none;
 }
 
+/* Moving the FRC 2468 logo to the right in the menu bar region (when unauthenticated) */
+div#menu-bar div#block-themecustomization-publichomepagefrclogo{
+    float: right;
+}
+
+/* Moving the CROMA logo to the center in the menu bar region (when unauthenticated) */
+div#block-themecustomization-publichomepagecromalogo{
+    right: -130px;
+    position: relative;
+}
+
+/* Moving the "Log Out" button all the way to the right in the menu bar region */
 div#menu-bar-wrapper nav#block-superfish-2{
   float: right;
 }
 
+/* Moving the help button all the way to the right in the menu bar region */
 div#menu-bar-wrapper section#block-themecustomization-displayhelp{
   float: right;
 }
 
+/* Moving the "notification rectangle" all the way to the right in the menu bar region */
 div#menu-bar-wrapper div#block-notifications-menubarnotification{
   float: right;
 }
 
+/* Adjusting styling for the "tbody" or table body */
 tbody{
     border-top: none;
     border-right: none;
@@ -73,6 +96,7 @@ tbody{
     border-bottom: none;
 }
 
+/* Styling every other (even) table row in the class "infoTable" */
 table.infoTable tr:nth-child(even){
     background-color: #fbfbfb;
     border: 1px solid #e1e1e2;
@@ -80,22 +104,26 @@ table.infoTable tr:nth-child(even){
     border-collapse: collapse; 
 }
 
+/* Styling every odd table row in the "infoTable" class */
 table.infoTable tr:nth-child(odd){
     border: 1px solid #e1e1e2;
     border-bottom: none;
     border-collapse: collapse; 
 }
 
+/* Giving the last table row a bottom border to close out the table */
 table.infoTable tr:last-child{
     border-bottom: 1px solid #e1e1e2;
 }
 
+/* Gives all table rows (except the first one) a small red border when hovered over by a user */
 table.infoTable tr:not(:first-child):hover{
     width: 100%;
     border: 1px solid #8E2115; 
     border-collapse: collapse;
 }
 
+/* Ensuring that table rows, table headers, and buttons in tables part of the class "infoTable" have no borders */
 table.infoTable tr th td button {
     border-top: none;
     border-right: none;
@@ -103,15 +131,12 @@ table.infoTable tr th td button {
     border-bottom: none;
 }
 
+/* Setting the background style for the div "content-style" */
 #content-style{
     background-color: #27408B;
 }
 
-img#notificationPhoto{
-width: 100%;
-height: auto;
-}
-
+/* Styling the "submit" buttons across CROMA - these are the ones found in forms (i.e. delete, cancel, duplicate, submit, or save) */
 input.form-button,
 input.form-submit {
   color: #ffffff;
@@ -131,6 +156,7 @@ input.form-submit {
    border-radius: 3px;
 }
 
+/* Adding styling for when you hover over a form button */
 input.form-button:hover,
 input.form-submit:hover,
 input.form-button:focus,
@@ -140,6 +166,7 @@ input.form-submit:focus {
   text-decoration: none;
 }
 
+/* Custom styling for a specific button with the id "edit-submit" */
 input#edit-submit {
     border-top: 2px solid #ffffff;
     border-right: none;
@@ -147,6 +174,7 @@ input#edit-submit {
     border-bottom: none;
 }
 
+/* Setting a custom background for a variety of specific buttons (referred to via ID) */
 input#edit-delete,
 input#edit-remove,
 input#edit-cancel,
@@ -157,26 +185,35 @@ input#edit-deleteprofile{
     background:#8E2115;
 }
 
+/* Makes the chosen dropdown less wide*/
+
+#edit_country_chosen{
+    width: 250px !important;
+}
+/* Setting the background color of the CROMA logo in the menu bar when it's clicked upon */
 a.menu_icon.menu-497.sf-depth-1.active{
     background-color:#000000;
 }
 
+/* Ensuring there is no padding for the div with the id "branding" */
 div#branding{
     padding: 0;
 }
 
+/* Moving all help messages, error messages, completion messages, and drupal messages (DPMs) down by 20px */
 div#messages-help-wrapper{
     position: relative;
     top: 20px;
 }
 
+/* Adding custom styling to the "mini" search form in the side bar */
 #block-outreach-searchformsidebar{
     border-collapse: separate; 
     background-color: #fbfbfb; 
     border: 1px solid #e1e1e2;
-
 }
 
+/* Adding various styling to the specific following tables */
 table#outreachPageHeader{
     border-collapse: separate; 
     border-spacing: 15px 20px;
@@ -200,15 +237,6 @@ table#myStatsOnTeamNumber{
     border-collapse: separate;
 }
 
-table#myTotalStats,
-table#teamStats,
-table#miniViewUser,
-table#viewTeamInfoTable,
-table#teamPhotoOnViewTeam{
-    background-color: #fbfbfb; 
-    border: 1px solid #e1e1e2;
-}
-
 table#miniViewTeam{
     border-collapse: separate;
     border-spacing: 0px 15px;
@@ -223,6 +251,33 @@ table#photoAndEdit{
     border: 1px solid #e1e1e2;
 }
 
+table#publicHomePageStatistics{
+    color: #27408B;
+    position: relative;
+    right: 75px;
+}
+
+table#publicHomePageInfo{
+    position: relative;
+    right: -75px;    
+}
+
+#block-user-login{
+   position: relative;
+   right: -270px;    
+}
+
+/* Adding a border and consistent background color to the following tables (referred to by IDs) */
+table#myTotalStats,
+table#teamStats,
+table#miniViewUser,
+table#viewTeamInfoTable,
+table#teamPhotoOnViewTeam{
+    background-color: #fbfbfb; 
+    border: 1px solid #e1e1e2;
+}
+
+/* Follow 4 are all styling the notification box in the menu bar */
 .tooltip {
     position: relative;
     display: inline-block;
@@ -258,10 +313,6 @@ table#photoAndEdit{
     border-color: transparent transparent #333333 transparent;
 }
 
-table#publicHomePageStatistics{
-    color: #27408B;
-}
-
 .mail {
     color: red;
 }
@@ -270,11 +321,13 @@ select.form-select{
     margin:0px 0px 0px 0px;
 }
 
+/* Moving over the "my stats on ___" so that the positioning is correct */
 td#myStatsOnMultTeams1, td#myStatsOnMultTeams2{
     position: relative;
     right: -18px;
 }
 
+/* Adjusting the CROMA logo in the menu bar */
 img#homeButtonImg{
     position: relative;
     top: 7px;
@@ -282,8 +335,9 @@ img#homeButtonImg{
     height: 25px;
 }
 
-/* Tool tip to the right*/
+/* "tooltip1", "tooltip2", "tooltip3", and "tooltip4" are the help pop-ups - following is all styling for them */
 
+/* tooltip 1 is applied to all help messages on the right of the item */
 .tooltip1 {
     position: relative;
     display: inline-block;
@@ -292,7 +346,6 @@ img#homeButtonImg{
 .tooltip1 .tooltiptext1 {
     visibility: hidden;
     width: 120px;
-/*    height: 150px; /* this wasn't here before */
     background-color: #333333;
     color: #ffffff;
     text-align: center;
@@ -301,7 +354,6 @@ img#homeButtonImg{
     z-index: 1;
     top: -5px;
     left: 110%;
-
 }
 
 .tooltip1 .tooltiptext1::after {
@@ -313,13 +365,9 @@ img#homeButtonImg{
     border-width: 5px;
     border-style: solid;
     border-color: transparent #333333 transparent transparent;
-
-
 }
 
-
-/* Tooltip to the left */
-
+/* tooltip 2 is applied to all help messages on the left of the item */
 .tooltip2 {
     position: relative;
     display: inline-block;
@@ -336,7 +384,6 @@ img#homeButtonImg{
     z-index: 1;
     top: -5px;
     right: 110%;
-
 }
 
 .tooltip2 .tooltiptext2::after {
@@ -348,12 +395,9 @@ img#homeButtonImg{
     border-width: 5px;
     border-style: solid;
     border-color: transparent transparent transparent #333333;
-
-
 }
 
-/*Tool tip to the top*/
-
+/* tooltip 3 is applied to all help messages on top of (above) the item */
 .tooltip3 {
     position: relative;
     display: inline-block;
@@ -371,9 +415,7 @@ img#homeButtonImg{
     bottom: 150%;
     left: 50%;
     margin-left: -60px;
-
 }
-
 
 .tooltip3 .tooltiptext3::after {
     content: "";
@@ -384,12 +426,9 @@ img#homeButtonImg{
     border-width: 5px;
     border-style: solid;
     border-color: #333333 transparent transparent transparent;
-
-
 }
 
-/* Tool tip to the bottom*/
-
+/* tooltip 3 is applied to all help messages below the item */
 .tooltip4 {
     position: relative;
     display: inline-block;
@@ -407,7 +446,6 @@ img#homeButtonImg{
     top: 150%;
     left: 50%;
     margin-left: -60px;
-
 }
 
 .tooltip4 .tooltiptext4::after {
@@ -421,6 +459,7 @@ img#homeButtonImg{
     border-color: transparent transparent #333333 transparent;
 }
 
+/* Following are all styling for various custom CROMA icons */
 .trashIcon {
     max-width:12px; 
     width:auto; 
@@ -458,6 +497,14 @@ img#homeButtonImg{
     margin: 0px;
 }
 
+.hoursIcon {
+    max-width:16px; 
+    width:auto; 
+    height:auto; 
+    padding: 0px 0px 0px 0px;
+    margin: 0px;
+}
+
 .helpIcon {
     width:15px; 
     margin: 8px 0px 0px 0px
@@ -471,21 +518,21 @@ img#homeButtonImg{
     margin: 0px;
 }
 
-#content-wrapper{
-  min-height: 100%;
-  height: auto !important;
-  height: 100%;
-  margin-bottom: 100px;
-
-}
-
+/* Following is styling to make the footer a "sticky footer" */
 #footer-wrapper{
     background-color: #27408B;
     margin: 0px;
-    position: fixed;
+    position: relative;
     width: 100%;
-    bottom: 0px;
+    bottom: auto;
     height: 105px;
+}
+#block-block-1{
+    margin-bottom: 0px;
+}
+
+footer.clearfix{
+    height: 100px;
 }
 
 #footer-wrapper>.container{

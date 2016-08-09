@@ -1,5 +1,14 @@
 <?php
 
+/*
+  ---- notification/notificationMenu.php ----
+
+  generates the menu bar notification
+
+  - Contents -
+  menuBarNotification() - shows how many notifications the current user has
+*/
+
 function menuBarNotification()
 {
   global $user;

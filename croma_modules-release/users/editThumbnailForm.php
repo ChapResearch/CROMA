@@ -22,7 +22,7 @@ function thumbnailForm($form, &$form_state)
     $form_state['URL_FID'] = $FID;
     $new = false;
   } else {
-    drupal_set_message("No Image!", "error");
+    drupal_set_message("No Image.", "error");
   }
 
   // set the title based on which thumbnail is being edited
@@ -39,7 +39,7 @@ function thumbnailForm($form, &$form_state)
     $form_state['URL_TID'] = $TID;
     $title = 'Team';
   } else {
-    drupal_set_message("Nothing to edit!", "error");
+    drupal_set_message("Nothing to edit.", "error");
   }
   
   $form = array();

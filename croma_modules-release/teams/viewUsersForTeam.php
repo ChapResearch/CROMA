@@ -22,7 +22,7 @@ function viewUsersForTeam($form, &$form_state)
   }
 
   if (teamIsIneligible($TID) || !isMyTeam($TID)) {
-    drupal_set_message('You do not have permission to access that page!', 'error');
+    drupal_set_message('You do not have permission to access that page.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 
@@ -30,12 +30,26 @@ function viewUsersForTeam($form, &$form_state)
 
   $canManageTeamMembers = hasPermissionForTeam('manageTeamMembers', $TID);
   $canManageTeamOwners = hasPermissionForTeam('manageTeamOwners', $TID);
-
-  // create page header, table, and pending users/view all button
-
   $markup = '<table><tr><td colspan="3">';
 
-  $markup .= "<h1>View All Members on Team ".dbGetTeamNumber($TID)."</h1></td>";
+  if (isset($params['query'])) {
+    $persons = dbSearchUsersFromTeam($TID, $params['query']);
+  } else {
+    $type = isset($params['type'])?$params['type']:'';
+    // filter by type (student vs mentor vs alumni)
+    $persons = dbGetUsersFromTeam($TID, $type); 
+  }
+
+  if (empty($persons)) {
+    drupal_set_message('No users found.', 'error');
+    drupal_goto($_SERVER['HTTP_REFERER']);
+  } else if (isset($params['query'])) {
+    $markup .= '<h1>Search Results (' . count($persons) . ' matches)</h1></td>';
+  } else {
+    $markup .= '<h1>' . count($persons) . ' users on Team ' . dbGetTeamNumber($TID) . '</h1></td>';
+  }
+
+  // create page header, table, and pending users/view all button
 
   $markup .= '<td colspan="3" style="text-align:right">';
 
@@ -57,20 +71,7 @@ function viewUsersForTeam($form, &$form_state)
   }    
 
   $markup .= '</td></tr></table>';
-
-  if (isset($params['query'])) {
-    $persons = dbSearchUsersFromTeam($TID, $params['query']);
-  } else {
-    $type = isset($params['type'])?$params['type']:'';
-    // filter by type (student vs mentor vs alumni)
-    $persons = dbGetUsersFromTeam($TID, $type); 
-  }
-
-  if (empty($persons)) {
-    drupal_set_message('No users found!', 'error');
-    drupal_goto($_SERVER['HTTP_REFERER']);
-  }
-  
+ 
   // sets up the table to display name, role, and grade of every user on the certain team
   $markup .= '<table class="infoTable"><th>Name</th>';
   $markup .= '<th>Email</td></th>';
@@ -227,7 +228,7 @@ function viewUsersForTeam_submit($form, $form_state)
 	dbRemoveAllUserRoles($UID, $TID);
       }
       $userName = dbGetUserName($UID);
-      drupal_set_message("$userName's role has been updated!");
+      drupal_set_message("$userName's role has been updated.");
       $roleChanged = true;
       $notification = array(
 			    'UID' => $UID,
@@ -243,13 +244,13 @@ function viewUsersForTeam_submit($form, $form_state)
 	$notification['message'] = 'You are now a ' . strtolower(dbGetRoleName($newRID));
       }
 
-      $notification['message'] .= ' on team '. dbGetTeamName($TID) . '!';
+      $notification['message'] .= ' on team '. dbGetTeamName($TID) . '.';
       dbAddNotification($notification);
     }
   } 
   
   if(!$roleChanged){
-    drupal_set_message('No changes were made!', 'error');
+    drupal_set_message('No changes were made. An issue occured.', 'error');
   }
 }
 

@@ -2,12 +2,14 @@
 
 /*
 
----- users/usersSearch.php ----
+ ---- users/usersSearch.php ----
 
-Used for searching of users on a given team.
-
+  - Contents-
+  usersSearch() - used for searching of users on a given team
+  usersSearchHeader() - used to create a header for users search
 */
 
+// used for searching users on a given team
 function usersSearch($form, &$form_state)
 {
   global $user;
@@ -21,24 +23,19 @@ function usersSearch($form, &$form_state)
   }
 
   if(teamIsIneligible($TID)) {
-    drupal_set_message('Your team does not have permission to access this page!', 'error');
+    drupal_set_message('Your team does not have permission to access this page.', 'error');
     drupal_goto('myDashboard');
-    return;
   }
 
   $form = array();
   
-  /*  $form['fields'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Search for a Team Member')
-			  );
-  */
-
+  // displays what a user can search
   $form['fields']['nameContains'] = array(
     '#type' => 'textfield',
     '#placeholder' => 'Name or Email'
 					  );
 
+  // submit button
   $form['fields']['submit'] = array(
     '#prefix' => '<div align="left" style="float:left">',
     '#type' => 'submit',
@@ -46,6 +43,7 @@ function usersSearch($form, &$form_state)
     '#suffix' => '</div>'
 				    );
 
+  // button to view all team members on current team
   $form['fields']['button'] = array(
     '#markup' => '<div align="right" style="float:right"><a href="?q=showUsersForTeam"><button type="button">View All Team Members</button></a></div>'
 				    );
@@ -56,15 +54,15 @@ function usersSearch($form, &$form_state)
 function usersSearch_validate($form, $form_state)
 {
   if(empty($form_state['values']['nameContains'])) {
-    form_set_error('nameContains', 'Must search for something!');
+    form_set_error('nameContains', 'Must search for something.');
   }
 
   if(is_numeric($form_state['values']['nameContains'])) {
-    form_set_error('nameContains', 'No numbers!');
+    form_set_error('nameContains', 'No numbers.');
   }
 
   if(strlen($form_state['values']['nameContains']) > 50) {
-    form_set_error('nameContains', 'Query must be less than 50 characters!');
+    form_set_error('nameContains', 'Query must be less than 50 characters.');
   }
 }
 
@@ -77,12 +75,11 @@ function usersSearch_submit($form, $form_state)
   return;
 }
 
-
+// used to create a header for users search
 function usersSearchHeader()
 {
   global $user;
   $params = drupal_get_query_parameters();
-
 
   if(isset($params["UID"]))  {
     $UID = $params["UID"];
@@ -90,6 +87,7 @@ function usersSearchHeader()
     $UID = $user->uid;
   }
 
+  // create table and header
   $markup = '<table><tr><div class="help tooltip2"><h2>Team Members</h2><span id="helptext"; class="helptext tooltiptext2">Click here to search for a team member or manage your teams permissions.</tr></span></div><th>Search For A Team Member</th></table>';
 
   return $markup;

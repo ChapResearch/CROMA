@@ -7,7 +7,7 @@ function addTeamMember($form, &$form_state)
     $form_state['TID'] = $params['TID'];
   }
   if (!isset($form_state['TID'])){
-    drupal_set_message('You need to specify a team!', 'error');
+    drupal_set_message('You need to specify a team.', 'error');
   }
 
   $teamName = dbGetTeamName($form_state['TID']);

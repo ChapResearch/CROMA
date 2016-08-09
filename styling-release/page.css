@@ -1,9 +1,3 @@
-/*
-#admin-menu {
-  display: none;
-}
-*/
-
 /* General page and module styles */
 #header-wrapper {
   position: relative;
@@ -52,14 +46,20 @@
 .site-name-hidden #branding .h-group {
   display: block;
 }
+
+
+/* CROMA TEAM CHANGES HERE */
+/* Removing the margin from the bottom of the page (and other divs) since code in style.css has a different margin-bottom for the "sticky footer" */
 #secondary-content-wrapper,
 #top-panels-wrapper,
 #content-wrapper,
 #footer-panels-wrapper,
 #tertiary-content-wrapper {
-/*  margin-bottom: 0px; */
   clear: both;
 }
+/* END CHANGES */
+
+
 .content-margin {
   margin: 0 10px;
 }

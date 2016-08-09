@@ -1,5 +1,14 @@
 <?php
 
+/*
+  ---- notifications/notificationForm.php ----
+
+  used to create notifications for an outreach
+
+  - Contents -
+  notificationForm() - form to choose timing, recipient and content of a custom notification
+*/   
+
 function notificationForm()
 {
   $params = drupal_get_query_parameters();
@@ -7,7 +16,7 @@ function notificationForm()
   if (isset($params['OID'])){
     $OID = $params['OID'];
   } else {
-    drupal_set_message('Not outreach specified!', 'error');
+    drupal_set_message('No outreach specified.', 'error');
   }
 
   $form['fields']=array(
@@ -22,19 +31,21 @@ function notificationForm()
   $outreachName = dbGetOutreachName($OID);
 
   if (!$outreachName){
-    drupal_set_message('Invalid outreach event!', 'error');
+    drupal_set_message('Invalid outreach event.', 'error');
     return;
   }
 
+  // simply displays the chosen outreach event
   $form['fields']['outreachName']=array(
 				  '#prefix'=>'<tr><td>',
 				  '#type'=>'textfield',
 				  '#title'=>t('Outreach Name:'),
-				  '#disabled'=>TRUE,
+				  '#disabled'=>true,
 				  '#default_value'=>$outreachName,
 				  '#suffix'=>'</td></tr>',
 				  );
 
+  // allow the user to choose who the notification will go to (of those signed up or who own the outreach)
   $UIDs = dbGetUIDsForOutreach($OID);
 
   if(!empty($UIDs)){
@@ -46,13 +57,13 @@ function notificationForm()
 				   '#suffix'=>'</td>'
 				   );
   } else {
-    drupal_set_message('There are no users associated with this event!', 'error');
+    drupal_set_message('There are no users associated with this event.', 'error');
     drupal_goto('manageNotifications', array('query'=>array('OID'=>$OID)));
-    return;
   }
 
+  // allow the user to choose when the notification will arrive
   $form['fields']['dateHeader'] = array('#markup'=>'<td colspan="2" align="left" style="text-align:left">');
-    
+
   $form['fields']['dateTargeted'] = array(
 						   '#type' => 'date_popup', 
 						   '#title' => t('Delivery Date:'),
@@ -96,11 +107,11 @@ function notificationForm_validate($form, $form_state)
   }
 
   if($noneChecked){
-    form_set_error("fields][UID", 'Please select a user!');
+    form_set_error("fields][UID", 'Please select a user.');
   }
   
   if($form_state['values']['dateTargeted'] == null){
-    form_set_error("fields][dateTargeted", 'Please select a date!');
+    form_set_error("fields][dateTargeted", 'Please select a date.');
   }
 }
 
@@ -110,6 +121,7 @@ function notificationForm_submit($form, $form_state)
   $params = drupal_get_query_parameters();
   $OID = $params['OID'];
 
+  // generate the notification
   $notification = getFields(array('dateTargeted', 'message'), $form_state['values']);
   $notification = stripTags($notification); // allow some tags
   $notification['dateTargeted'] = dbDatePHP2SQL(strtotime($notification['dateTargeted']));
@@ -128,20 +140,7 @@ function notificationForm_submit($form, $form_state)
     drupal_set_message('Notification added!');
     drupal_goto('manageNotifications', array('query'=>array('OID'=>$OID)));
   } else {
-    drupal_set_message('There was an error!', 'error');
-  }
-}
-
-// deleteNotification() - Deletes notification given by $NID. Used on the manageNotifications page.
-function deleteNotification($NID, $OID)
-{
-  dbDeleteNotification($NID);
-  drupal_set_message('Notification has been deleted!');
-
-  if(isset($_SERVER['HTTP_REFERER'])){
-    drupal_goto($_SERVER['HTTP_REFERER']);
-  } else {
-    drupal_goto('manageNotifications', array('query'=>array('OID'=>$OID)));
+    drupal_set_message('There was an error.', 'error');
   }
 }
 

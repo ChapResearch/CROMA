@@ -1,5 +1,14 @@
 <?php
 
+/*
+  ---- users/deleteUser.php ----
+
+  functions to display various data on the home page shown when not logged in
+
+  - Contents -
+  deleteUserPage() - warns the user about deleting his/her account and allows user to provide feedback
+*/
+
 function deleteUserPage($form, &$form_state)
 {
   $form['header'] = array( // general header
@@ -55,11 +64,9 @@ function deleteUserPage_submit($form, $form_state)
   $params['feedback'] = stripTags($form_state['values']['misc'], ''); // stripping any "illegal" HTML tags
   $params['userName'] = dbGetUserName($UID); // getting the user name
 
-  drupal_mail('users', 'userDeleted', 'croma@chapresearch.com', variable_get('language_default'), $params, $from = NULL, $send = TRUE); // sending the user a confirmation mail
+  drupal_mail('users', 'userdeleted', 'croma@chapresearch.com', variable_get('language_default'), $params, $from = null, $send = true); // sending the user a confirmation mail
 
   drupal_set_message("Your account has been deleted. We're sorry to see you go!"); // message displayed and redirected to front page
   drupal_goto('<front>');
 }
-
-
 ?>

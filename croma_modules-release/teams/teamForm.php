@@ -161,7 +161,7 @@ function teamForm($form, &$form_state)
 
     // checking proper permissions for user
     if (!$new && !hasPermissionForTeam('editTeam', $params['TID'])){ 
-      drupal_set_message("You don't have permission to edit {$oldTeam['name']}!", 'error');
+      drupal_set_message("You don't have permission to edit {$oldTeam['name']}.", 'error');
       drupal_goto('viewTeam', array('query'=>array('TID'=>$params['TID'])));
     }
     return $form;

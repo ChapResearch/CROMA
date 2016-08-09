@@ -1,6 +1,8 @@
 <?php
+
 /*
-  Used to allow users to add/edit their profile
+  ---- users/profileForm.php ----
+  used to allow users to add/edit their profile
 
   - Contents -
   profileForm() - paints form to allow user to edit profile (including secondary email)
@@ -49,13 +51,14 @@ function profileForm($form, &$form_state)
     }
   }
 
-  if($user->uid==$UID){
+  // if the user is viewing his/her own profile, he/she should be able to edit it
+  if($user->uid == $UID){
     $canEdit = true;
   }
 
   if(!$canEdit){
-    drupal_set_message("You don't have permission to edit this user!", 'error');
-        return;
+    drupal_set_message("You don't have permission to edit this user.", 'error');
+    return;
   }
   
 
@@ -199,7 +202,7 @@ function profileForm_validate($form, $form_state)
 
   // checks that bio isn't too long
   if (strlen($form_state['values']['bio']) > MAX_BIO_CHARS){
-    form_set_error('bio','Your bio cannot be longer than '.MAX_BIO_CHARS.' characters!'); 
+    form_set_error('bio','Your bio cannot be longer than '.MAX_BIO_CHARS.' characters.'); 
   }
 }
 
@@ -244,7 +247,6 @@ function profileForm_submit($form, $form_state)
   } else { // user didn't enter value
     dbRemoveEntry('emailsVsUsers', 'UID', $profileData['UID']);
   }
-	
 
   drupal_goto("viewUser", array('query'=>array('UID'=>$UID)));
 }
@@ -252,11 +254,14 @@ function profileForm_submit($form, $form_state)
 function backToProfile()
 {
   global $user;
-  $UID = $user->uid;
   $params = drupal_get_query_parameters();
-  if(isset($params['UID'])){
-  $UID = $params['UID'];
-  }
+
+  if (isset($params['UID'])){
+    $UID = $params['UID'];
+  } else {
+    $UID = $user->uid;
+  }    
+
   drupal_goto("viewUser", array('query'=>array('UID'=>$UID)));
 }
 

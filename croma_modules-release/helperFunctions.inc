@@ -1,5 +1,23 @@
 <?php
 
+/*
+  ---- helperFunctions.php ----
+
+  a file full of functions to be used throughout CROMA
+
+  - Contents -
+  states_list(), countries_list()
+  getFields(), stripTags(), orderByValue(), chopString()
+  sortHeader(), showAllButton(), 
+  clearCurrentTeam(), getCurrentTeam(), selectDefaultTeam(), setCurrentTeam()
+  teamIsIneligible()
+  getSharedTeams(), isOnMyTeam(), isMyTeam(), isMyOutreach(), isMyHours(), isMyMedia()
+  notifyUsersByRole(), notifyOwnerOfOutreach(), notifyUsersOnTeam()
+  hasPermissionForTeam()
+  generateMailHeader(), generateMailFooter()
+  getCurrentURL(), getAjaxURL(), parseURLAlias()
+*/
+
 function states_list()
 {
   return array(
@@ -55,13 +73,12 @@ function states_list()
 	       'West Virginia'=>'West Virginia',
 	       'Wisconsin'=>'Wisconsin',
 	       'Wyoming'=>'Wyoming',
-	       'DC' => 'District of Columbia',
-	       'AS' => 'American Samoa',
-	       'GU' => 'Guam',
-	       'MP' => 'Northern Mariana Islands',
-	       'PR' => 'Puerto Rico',
-	       'UM' => 'United States Minor Outlying Islands',
-	       'VI' => 'Virgin Islands, U.S.',
+	       'American Samoa' => 'American Samoa',
+	       'Guam' => 'Guam',
+	       'Northern Mariana Islands' => 'Northern Mariana Islands',
+	       'Puerto Rico' => 'Puerto Rico',
+	       'United States Minor Outlying Islands' => 'United States Minor Outlying Islands',
+	       'Virgin Islands, U.S.' => 'Virgin Islands, U.S.',
 	       'Other'=>'Other');
 }
 
@@ -368,7 +385,7 @@ function orderByValue(&$array, $orderParam, $isAscending = false)
       if($isAscending) {
 	return $timeA < $timeB ? -1 : 1;
       } else {
-	return $timeA < $timeB ? -1 : 1;
+	return $timeA < $timeB ? 1 : -1;
       }
     };
   } else {
@@ -399,11 +416,7 @@ function orderByValue(&$array, $orderParam, $isAscending = false)
 function sortHeader ($orderParam, $extraParams, $isAscending, $label, $field, $page)
 {
   $retVal = "<a href=\"?q=$page&sort=$field";
-  /*
-  if ($showAll) {
-    $retVal .= "&showAll";
-  }
-  */
+
   foreach ($extraParams as $param => $value){
     $retVal .= "&$param=$value";
   }
@@ -491,6 +504,8 @@ function getCurrentTeam()
   }
 }
 
+/* selectDefaultTeam() - returns either the default team for a user, or the first team they have if not set
+ */
 function selectDefaultTeam()
 {
   global $user;
@@ -605,12 +620,8 @@ function isMyMedia($MID)
   return $user->uid == dbGetUserForMedia($MID);
 }
 
-function isAdmin()
-{
-  $role = user_role_load_by_name('Administrator');
-  return user_has_role($role->rid);
-}
-
+/* notifyUsersByRole() - send the notification data (in $notificationContents) to all users with the given role. Note that the TID within notificationContents is used to determine which team the notification is sent to, but the UID (if present) if overwritten.
+ */
 function notifyUsersByRole($notificationContents, $role)
 {
   global $user;
@@ -631,21 +642,6 @@ function hasPermissionForTeam($permission, $TID)
 
   return dbUserHasPermissionForTeam($user->uid, $permission, $TID);
 }
-
-// TODO - why is this here?!?!?!?!?!?!
-function requestTeamForUser($UID, $TID)
-{
-  $name = dbGetUserName($UID);
-  $title = 'Team Member Join Request: ' . $name;
-  $content = $name . ' has requested to join Team ' . dbGetTeam($TID)['number'] . '. Click <a href="?q=approveUser&UID=' . $UID . '&TID=' . $TID . '">here</a> to review and approve this member.';
-  $notif = array(
-                 'TID'=>$TID,
-                 'title'=>$title,
-                 'message'=>$content
-                 );
-  return notifyUsersByRole($notif, 'teamAdmin');
-}
-
 /* notifyOwnerOfOutreach() - notifies the owner of an outreach if the owner is NOT the current user.
  */
 function notifyOwnerOfOutreach($OID, $notification)
@@ -661,6 +657,8 @@ function notifyOwnerOfOutreach($OID, $notification)
   return false;
 }
 
+/* notifyUsersOnTeam() - sends the given notification to all users on the team
+ */
 function notifyUsersOnTeam($notification, $TID)
 {
   global $user;
@@ -673,13 +671,8 @@ function notifyUsersOnTeam($notification, $TID)
   }
 }
 
-function notifyUser($notification, $UID)
-{
-  global $user;
-  $notification['UID'] = $UID;
-  dbAddNotification($notification);
-}
-
+/* generateMailHeader() - creates the HTML to start a beautifully styled, CROMA email
+ */
 function generateMailHeader()
 {
   $HTML = '<div style="background-color:#fbfbfb; border:1px solid #e1e1e2;width:60%;margin:auto">';
@@ -687,11 +680,13 @@ function generateMailHeader()
   return $HTML;
 }
 
+/* generateMailFooter() - creates the HTML to end a beautifully styled, CROMA email
+ */
 function generateMailFooter()
 {
   $HTML = '</td></tr>';
   $HTML .= '<tr><td style="text-align:center">';
-  $HTML .= '<img src="http://croma.chapresearch.com'.PORT.'/images/homePage/CROMALogo.png" width="200px" height="80px">';
+  $HTML .= '<img src="http://croma.chapresearch.com'.PORT.'/images/homePage/CROMALogo.jpg" width="200px" height="80px">';
   $HTML .= '</td></tr>';
   $HTML .= '</table>';
   return $HTML;
@@ -743,6 +738,32 @@ function fillFromSession($fieldName, $default = '')
     }
   }
   return $default;
+}
+
+function showOutreachStatusIcon($status)
+{
+  // determines file name and span title for the status icon
+  switch($status) {
+  case 'isOutreach': 
+    $spanTitle = 'Outreach Event';
+    $fileName = 'outreachBlue.png';
+    break;
+  case 'isIdea': 
+    $spanTitle = 'Idea';
+    $fileName = 'ideaBlue.png';
+    break;
+  case 'doingWriteUp': 
+    $spanTitle = 'Write Up';
+    $fileName = 'writeUpBlue.png';
+    break;
+  case 'locked': 
+    $spanTitle = 'Locked Event';
+    $fileName = 'lockedBlue.png';
+    break;
+  }  
+
+  // displays the icons for the outreach status
+  return '<span title="'.$spanTitle.'"><img class="eventIndicatorIcon" src="/images/icons/'.$fileName.'"></span>';
 }
 
 ?>

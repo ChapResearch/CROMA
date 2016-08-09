@@ -131,7 +131,7 @@ function manageUserTeams()
 	$markup .= '<a href="?q=deleteTeamPage&TID=' . $team['TID'] .'"><button><img class="trashIcon" src="/images/icons/trashWhite.png"></button></a></td>';
       } else if(isset($team['isPending'])){
 	$markup .= '<td><a href="?q=rescindTeamApplication/' . $team['TID'] . '">';
-	$markup .= '<button>Rescind Application</button></a>';
+	$markup .= '<button>Withdraw Application</button></a>';
       } else if(isset($team['isUnapproved'])){
 	$markup .= '<td><a href="?q=teamForm&TID=' .$team['TID'] .'"><button><img class="editIcon" src="/images/icons/editWhite.png"></button></a></td>';
       } else{
@@ -195,7 +195,7 @@ function rescindTeamApplication($TID)
 
   notifyUsersByRole($notification, 'teamAdmin');
 
-  drupal_set_message("Your application to $teamName has been removed!");
+  drupal_set_message("Your application to $teamName has been removed.");
 
 
   if(isset($_SERVER['HTTP_REFERER'])){

@@ -7,6 +7,7 @@
 
   - Contents -
   manageNotifications() - add or delete notifications for an outreach event
+  deleteNotification() - menu hook callback to delete a notification
 */
 
 function manageNotifications()
@@ -55,9 +56,21 @@ function manageNotifications()
 
   } else {
     // returns message if OID is not correct
-    drupal_set_message('No outreach selected!', 'error');
+    drupal_set_message('No outreach selected.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
 } 
 
+// deleteNotification() - Deletes notification given by $NID.
+function deleteNotification($NID, $OID)
+{
+  dbDeleteNotification($NID);
+  drupal_set_message('Notification has been deleted.');
+
+  if(isset($_SERVER['HTTP_REFERER'])){
+    drupal_goto($_SERVER['HTTP_REFERER']);
+  } else {
+    drupal_goto('manageNotifications', array('query'=>array('OID'=>$OID)));
+  }
+}
 ?>

@@ -1,11 +1,11 @@
 <?php
+
 /*
-  Used to allow users to add old hours (aka pre-CROMA)
+  ---- hourLogging/viewHours.php ----
+  used to show various hours that have been logged (based on various filters)
 
   - Contents -
   viewHours() - displays a table of hours (taking different parameters to show for users, teams etc.)
-  deleteHours() - used as a menu hook to delete hours
-  approveHours() - used as a menu hook to approve hours
 */   
 
 function viewHours()
@@ -13,19 +13,17 @@ function viewHours()
   $params = drupal_get_query_parameters();
   global $user;
 
-  //checkes to make sure you are assigned to a team
+  // checks to make sure you are assigned to a team
   if(dbGetTeamsForUser($user->uid) == NULL){
-    drupal_set_message("You don't have a team assigned!", 'error');
+    drupal_set_message("You don't have a team assigned.", 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
-    return;
   }
 
   // setting all permissions to a default "false" value
-  $canEdit = false;
-  $canApprove = false;
-  $myHours = false;
+  $canEdit = $canApprove = $myHours = false;
+
   $markup = '';
-  //showing the hours if the UID is set for a user 
+  // showing the hours if the UID is set for a user 
   $filterParams = array();
   if(isset($params['UID'])){
     $UID = $params['UID'];
@@ -35,7 +33,7 @@ function viewHours()
     $markup = "<table><tr><td><h1>Hours for $userName</h1></td></tr></table>";
   }
   
-  //showing the hours if the OID is set for an outreach  
+  // showing the hours if the OID is set for an outreach  
   if(isset($params['OID'])){
     $OID = $params['OID'];
     $TID = getCurrentTeam()['TID'];
@@ -52,7 +50,7 @@ function viewHours()
     $markup = "<table><tr><td><h1>Hours contributed to $outreachName by $userName</h1></td></tr></table>";
   }
 
-  //showing the hours needing to be approved for a team if the TID is set
+  // showing the hours needing to be approved for a team if the TID is set
   if(isset($params['TID'])){
     $TID = $params['TID'];
     $filterParams['TID'] = $TID;
@@ -61,14 +59,14 @@ function viewHours()
     $markup = "<table><tr><td><h1>Hours to be approved for $teamName</h1></td></tr></table>";
   }
 
-  //if the filters are not empty...
+  // if the filters are not empty...
   if(!empty($filterParams)){
     $hoursEntries = dbGetHours($filterParams); // get all the matching "hour" records
     if(isset($OID)){
       $markup .= '<td style="text-align:right">';
       $markup .= "<a href=\"?q=logHours&OID=$OID\"><button>Add Hours</button></a></td></tr></table>";
     }
-    $markup .= '<table class="infoTable">'; //starting the table
+    $markup .= '<table class="infoTable">'; // starting the table
     if(empty($OID)){
       $markup .= '<th>Event</th>';
     }
@@ -89,7 +87,9 @@ function viewHours()
 	$outreachName = dbGetOutreachName($hours['OID']);
 	$markup .= "<td><a href=\"?q=viewOutreach&OID={$hours['OID']}\">$outreachName</a></td>";
       }
-      if(!$myHours){
+      
+      // if the hours don't belong the current user, show the name of the person they do belong to
+      if(!$myHours){ 
 	$markup .= '<td>';
 	if ($hours['UID'] != null){
 	  $name = dbGetUserName($hours['UID']);
@@ -109,15 +109,16 @@ function viewHours()
       }
       $markup .= "<td>$formalType</td>";
       $markup .= "<td>{$hours['numberOfHours']}</td>";
-      if($canEdit || $canApprove){ //if the user can edit or approve hours then it'll do the code below...
+
+      if($canEdit || $canApprove){
 	$markup .= '<td>';
-	if($canEdit){ //if user can edit...
+	if($canEdit){ // if user can edit...
 	  $markup .= "<a href=\"?q=logHours&HID={$hours['HID']}\">";
 	  $markup .= '<button><img class="editIcon" src="/images/icons/editWhite.png"></button></a>';
 	  $markup .= "<a href=\"?q=deleteHours/{$hours['HID']}\">";
 	  $markup .= '<button><img class="trashIcon" src="/images/icons/trashWhite.png"></button></a>';
 	}
-	if($canApprove && !$hours['isApproved']){ //if user can approve hours and the hours are not approved...
+	if($canApprove && !$hours['isApproved']){ // if user can approve hours and the hours are not approved...
 	  $markup .= "<a href=\"?q=approveHours/{$hours['HID']}\">";
 	  $markup .= '<button>Approve Hours</button></a>';
 	} else if(!$hours['isApproved']){
@@ -134,34 +135,10 @@ function viewHours()
 
     $markup .= '</table>';
   } else { // no filter params
-    drupal_set_message('No outreach selected!', 'error');
+    drupal_set_message('No filter parameters selected.', 'error');
     drupal_goto($_SERVER['HTTP_REFERER']);
   }
   return array('#markup'=>$markup);
-}
-
-function deleteHours($HID) //function which deletes hours in hourLogging table
-{
-  dbDeleteHours($HID);
-  drupal_set_message('Hours have been deleted!');
-
-  if(isset($_SERVER['HTTP_REFERER'])){
-    drupal_goto($_SERVER['HTTP_REFERER']);
-  } else {
-    drupal_goto('viewHours');
-  }
-}
-
-function approveHours($HID) //function which approves hours
-{
-  dbApproveHours($HID);
-  drupal_set_message('Hours have been approved!');
-
-  if(isset($_SERVER['HTTP_REFERER'])){
-    drupal_goto($_SERVER['HTTP_REFERER']);
-  } else {
-    drupal_goto('viewHours');
-  }
 }
 
 ?>

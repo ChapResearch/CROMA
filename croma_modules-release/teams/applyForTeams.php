@@ -3,7 +3,7 @@
 /*
   ---- teams/applyForTeams.php ----
 
-  used for creating forms related to applying to teams
+  used for creating (and auto-filling) form to apply to teams
 
   - Contents -
   applyForTeamForm() - allows user to apply for membership on a team
@@ -43,23 +43,26 @@ function applyForTeamForm()
 						 )
 				  );
 
+  // this form will be filled in via AJAX
   $form['fields']['teamName']=array(
 				    '#prefix'=>'<div id="div_team_name_wrapper">',
 				    '#type'=>'textfield',
 				    '#title'=>t('Team Name:'),
-				    '#disabled'=>TRUE,
+				    '#disabled'=>true,
 				    '#suffix'=>'</div>'
 				    );
   
+  // this form is filled in from previous data
   $form['fields']['personName']=array(
 				      '#prefix'=>'</td></tr><tr><td>',
 				      '#type'=>'textfield',
 				      '#title'=>t('Your Name:'),
 				      '#default_value'=>"{$profile['firstName']} {$profile['lastName']}",
-				      '#disabled'=>TRUE,
+				      '#disabled'=>true,
 				      '#suffix'=>'</td>'
 				      );
 
+  // user email is filled in, but still editable
   $form['fields']['email']=array(
 				 '#prefix'=>'<td>',
 				 '#type'=>'textfield',
@@ -114,11 +117,13 @@ function applyForTeamForm_submit($form, $form_state)
   $teamName = dbGetTeamName($form_state['TID']);
   $note = $form_state['values']['message'];
 
+  // fill in the fields of the application
   $application['UID'] = $user->uid;
   $application['TID'] = $form_state['TID'];
   $application['userEmail'] = stripTags($email, ''); // do not allow tags
   $application['userMessage'] = stripTags($note); // allow some tags
   
+  // add a notification for the team owner and admins
   if(dbApplyForTeam($application)) { // note that this does its own error checking
     $notification['dateCreated'] = dbDatePHP2SQL(time());
     $notification['dateTargeted'] = dbDatePHP2SQL(time());
@@ -141,7 +146,7 @@ function fillTeamName(&$form, &$form_state)
   $team = dbGetTeamByNumber($form_state['values']['number']);
   $teamName = isset($team['name'])?$team['name']:'NOT REGISTERED WITH CROMA';
   $form['fields']['teamName']['#value'] = $teamName;
-  $form_state['rebuild'] = TRUE;
+  $form_state['rebuild'] = true;
   return $form['fields']['teamName'];
 }
 
